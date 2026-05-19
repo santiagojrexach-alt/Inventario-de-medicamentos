@@ -83,7 +83,8 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .gsr-item:last-child{border-bottom:none}
 .gsr-item:hover{color:var(--ac)}
 /* PANELS */
-.panel{display:none}.panel.active{display:block}
+.panel{display:none;animation:fadeIn 150ms ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}.panel.active{display:block}
 /* CARDS */
 .card{background:var(--pc);border:1px solid var(--bd);border-radius:var(--rlg);padding:.85rem 1rem;margin-bottom:.5rem}
 .sec{font-size:10px;font-weight:700;color:var(--tm);margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em}
@@ -302,11 +303,20 @@ button:hover{background:var(--ps)}
   .g5{grid-template-columns:1fr 1fr}
   .tab{padding:7px 10px;font-size:11px}.tab-sm{padding:4px 8px;font-size:10px}
   .card{padding:.7rem .8rem}.gantt-label{width:85px}.ibtn{width:34px;height:34px}
-  /* Collapse export ibtn into overflow menu on narrow screens */
   .ibtn.mobile-hide{display:none}
   .topbar-more{display:flex}
-  /* Chip Dispensar en inventario — más pequeño en móvil */
   .inv-disp-btn{font-size:8px!important;padding:1px 3px!important}
+}
+@media(max-width:360px){
+  .wrap{padding:.2rem}
+  .tab{padding:5px 7px;font-size:10px}
+  .card{padding:.5rem .6rem}
+  .mc{padding:.35rem .4rem}
+  .mcv{font-size:22px}
+  .topbar{padding:5px 8px;gap:4px}
+  .app-title{font-size:13px}
+  .lsub{font-size:9px;padding:2px 5px}
+  .nav-primary,.nav-secondary{padding:2px;gap:2px}
 }
 /* ── ANÁLISIS: section headers ──────────────────────────── */
 .analisis-idx{display:none;position:sticky;top:0;z-index:15;background:var(--pc);border:1px solid var(--bdl);border-radius:var(--rmd);padding:5px 8px;margin-bottom:.45rem;box-shadow:0 2px 6px rgba(0,0,0,.07);overflow-x:auto;scrollbar-width:none}
@@ -366,6 +376,50 @@ button:hover{background:var(--ps)}
 .empty-state-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
 .empty-state-body{font-size:12px;line-height:1.6;margin-bottom:12px}
 
+/* ── Clases utilitarias para botones inline ─────────────────── */
+.btn-inline-primary{border:none;background:var(--ac);color:#fff;cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap}
+.btn-inline-secondary{border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap}
+.btn-inline-ghost{border:1px solid var(--bdl);background:var(--ps);color:var(--tm);cursor:pointer;font-size:10px;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.btn-quick-1caja{border:none;background:var(--ac);color:#fff;cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap}
+.btn-quick-disp{border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap}
+.inv-quick-stock{font-size:14px;font-weight:700}
+.inv-quick-actions{display:flex;gap:4px}
+.row-info-sm{font-size:11px;color:var(--tm);white-space:nowrap}
+
+/* ── Pantalla de autenticación ──────────────────────────────── */
+#auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:600;
+  align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--pc);border:1px solid var(--bd);border-radius:var(--rlg);
+  padding:32px 28px;width:min(400px,100%);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo span{font-size:36px}
+.auth-logo h1{font-size:18px;font-weight:700;color:var(--t1);margin:8px 0 4px}
+.auth-logo p{font-size:12px;color:var(--tm)}
+.auth-tabs{display:flex;background:var(--ps);border-radius:var(--rsm);padding:3px;
+  margin-bottom:20px;gap:2px}
+.auth-tab{flex:1;padding:7px;border:none;background:none;border-radius:3px;
+  font-size:13px;cursor:pointer;color:var(--tm);font-weight:500}
+.auth-tab.active{background:var(--pc);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:5px}
+.auth-field input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--rsm);
+  font-size:14px;background:var(--bg);color:var(--t1);box-sizing:border-box}
+.auth-field input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acl)}
+.auth-btn{width:100%;padding:11px;background:var(--ac);color:#fff;border:none;
+  border-radius:var(--rsm);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed}
+.auth-btn:hover:not(:disabled){filter:brightness(1.1)}
+.auth-msg{font-size:12px;text-align:center;margin-top:12px;min-height:18px}
+.auth-msg.error{color:#C04040}
+.auth-msg.ok{color:#1A7040}
+.auth-forgot{font-size:11px;color:var(--ac);cursor:pointer;text-align:right;
+  margin-top:-8px;margin-bottom:12px;display:block}
+.auth-divider{border:none;border-top:1px solid var(--bd);margin:16px 0}
+#sync-indicator{display:none;align-items:center;gap:6px;font-size:11px;color:var(--tm);
+  padding:4px 8px;border-radius:var(--rsm);background:var(--ps)}
+#sync-indicator.syncing{color:var(--ac)}
+#sync-indicator.error{color:#C04040}
+
 </style>
 
   <link rel="manifest" href="data:application/json,{
@@ -384,7 +438,12 @@ button:hover{background:var(--ps)}
   <meta name="theme-color" content="#18302A">
 </head>
 <body>
-<div class="wrap" style="position:relative" id="main-wrap">
+<div id="app-loading" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#EEF5EE;z-index:700;gap:16px">
+  <span style="font-size:48px">💊</span>
+  <div style="font-size:14px;font-weight:600;color:#1a2e1a">Inventario Tarmed</div>
+  <div style="font-size:12px;color:#5a7a5a;max-width:300px;text-align:center" id="loading-msg">Conectando...</div>
+</div>
+<div class="wrap" style="position:relative;display:none" id="main-wrap">
 <!-- TOPBAR -->
 <div class="topbar">
   <button class="back-btn ibtn" id="back-btn" onclick="goBack()" title="Volver a la pestaña anterior" style="display:none">
@@ -395,6 +454,7 @@ button:hover{background:var(--ps)}
     <span class="app-subtitle" id="app-subtitle-label" style="display:none"></span>
   </div>
   <div id="tarmed-chip-wrap" style="margin-left:4px"></div>
+  <div id="sync-indicator"></div>
   <div id="save-ind" style="display:none;align-items:center;gap:4px" title="Estado de guardado">
     <div id="save-dot" class="save-dot"></div>
     <span id="save-label" style="font-size:10px;color:var(--tm)"></span>
@@ -489,7 +549,7 @@ button:hover{background:var(--ps)}
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
     <div class="search-box" style="flex:1;margin-bottom:0">
       <div class="si">🔍</div>
-      <input type="text" id="inv-search" placeholder="Buscar medicamento..." autocomplete="off">
+      <input type="text" id="inv-search" placeholder="Buscar por nombre, dosis o lab…" autocomplete="off">
     </div>
     <div class="inv-view-toggle">
       <button class="inv-view-btn active" id="inv-view-detail" onclick="setInvView('detail')" title="Vista detallada">☰</button>
@@ -631,6 +691,11 @@ button:hover{background:var(--ps)}
         <select id="ret-filter-mes" style="font-size:11px;width:auto;padding:3px 7px">
           <option value="">Todos los meses</option>
         </select>
+        <label style="font-size:11px;color:var(--tm)">Desde</label>
+        <input type="date" id="ret-filter-desde" style="font-size:11px;padding:2px 4px;border:1px solid var(--bdl);border-radius:3px;background:var(--ps);color:var(--t1)" onchange="renderRetiros()">
+        <label style="font-size:11px;color:var(--tm)">Hasta</label>
+        <input type="date" id="ret-filter-hasta" style="font-size:11px;padding:2px 4px;border:1px solid var(--bdl);border-radius:3px;background:var(--ps);color:var(--t1)" onchange="renderRetiros()">
+        <button onclick="document.getElementById('ret-filter-desde').value='';document.getElementById('ret-filter-hasta').value='';renderRetiros()" style="font-size:10px;padding:2px 6px;border:1px solid var(--bdl);border-radius:3px;background:var(--ps);color:var(--tm);cursor:pointer">✕</button>
         <button class="tbtn" onclick="clearRetFiltros()" style="font-size:10px;padding:2px 8px">✕ Limpiar filtros</button>
       </div>
       <div id="retiros-list"></div>
@@ -648,6 +713,7 @@ button:hover{background:var(--ps)}
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-consumo')">💊 Consumo</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-proj')">📈 Proyección</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-detalle')">🔬 Detalle</button>
+      <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-residentes')">👤 Residentes</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-audit')">📋 Cambios</button>
     </div>
   </div>
@@ -703,6 +769,8 @@ button:hover{background:var(--ps)}
 
   <!-- ── DETALLE ────────────────────────────────────────── -->
   <div class="analisis-section-hdr" id="sec-detalle">🔬 Detalle</div>
+  <div class="analisis-section-hdr" id="sec-residentes" style="margin-top:.6rem">👤 Por residente</div>
+  <div id="residentes-stats"></div>
   <div class="analisis-section-hdr" id="sec-audit" style="margin-top:.6rem">📋 Registro de cambios</div>
   <div id="audit-list" style="font-size:11px"></div>
   <div class="card" style="margin-bottom:.45rem">
@@ -869,6 +937,9 @@ button:hover{background:var(--ps)}
         <div style="font-size:12px;font-weight:600;margin-bottom:3px">🗑 Datos locales</div>
         <p style="font-size:11px;color:var(--tm);margin-bottom:8px;line-height:1.5">Borra todos los datos del browser y restaura el inventario de ejemplo.</p>
         <button class="btnred" onclick="clearStorage()">Borrar y restaurar defaults</button>
+            <hr style="border:none;border-top:1px solid var(--bd);margin:8px 0">
+            <div style="font-size:12px;color:var(--tm);margin-bottom:6px" id="auth-user-email"></div>
+            <button class="tbtn" onclick="authLogout()" style="background:var(--ps);color:var(--t2)">Cerrar sesión</button>
   </div>
   </div>
 </div>
@@ -951,8 +1022,274 @@ button:hover{background:var(--ps)}
   </div>
 </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
+
+
+
+
+
 <script>
+// ══ SUPABASE — cliente y autenticación ══════════════════════
+const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2aGthaGFmeXl2cHl6bHFoY2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNDYwNjIsImV4cCI6MjA5NDcyMjA2Mn0.rxnT6EeN1Kl7IX4eBWClNitKKrXiudM63l4K6-eOGlc';
+let supaClient = null;
+let supaCurrentUser = null;
+
+function initSupabase() {
+  if (typeof window.supabase === 'undefined') {
+    console.error('[Tarmed] Supabase SDK no cargado');
+    return false;
+  }
+  supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  return true;
+}
+
+// ── Indicador de sincronización ──────────────────────────────
+function setSyncStatus(status, msg) {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  el.className = 'sync-indicator ' + status;
+  el.style.display = status ? 'flex' : 'none';
+  const icons = { syncing: '☁', ok: '✓', error: '⚠' };
+  el.innerHTML = status
+    ? `<span style="font-size:11px">${icons[status]||''} ${msg}</span>`
+    : '';
+  if (status === 'ok') setTimeout(() => { if(el) el.style.display='none'; }, 2500);
+}
+
+// ── Auth: pantalla de login ──────────────────────────────────
+function showAuthScreen() {
+  const el = document.getElementById('auth-screen');
+  if (el) el.style.display = 'flex';
+  document.getElementById('main-wrap').style.display = 'none';
+}
+function hideLoading() {
+  const el = document.getElementById('app-loading');
+  if (el) el.style.display = 'none';
+}
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loading-msg');
+  if (el) el.textContent = msg;
+}
+function hideAuthScreen() {
+  const el = document.getElementById('auth-screen');
+  if (el) el.style.display = 'none';
+  document.getElementById('main-wrap').style.display = '';
+  hideLoading();
+}
+function authSwitchTab(tab) {
+  document.getElementById('auth-login').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-msg').textContent = '';
+}
+function setAuthMsg(msg, isError=true) {
+  const el = document.getElementById('auth-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'auth-msg ' + (isError ? 'error' : 'ok');
+}
+function setAuthLoading(loading) {
+  ['login-btn','reg-btn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = loading;
+  });
+}
+
+async function authLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if (!email || !pass) { setAuthMsg('Completá email y contraseña.'); return; }
+  setAuthLoading(true);
+  setAuthMsg('');
+  const { data, error } = await supaClient.auth.signInWithPassword({ email, password: pass });
+  setAuthLoading(false);
+  if (error) { setAuthMsg(error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos.' : error.message); return; }
+  await onAuthSuccess(data.user);
+}
+
+async function authRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  if (!email || !pass) { setAuthMsg('Completá todos los campos.'); return; }
+  if (pass.length < 6)  { setAuthMsg('La contraseña debe tener al menos 6 caracteres.'); return; }
+  if (pass !== pass2)   { setAuthMsg('Las contraseñas no coinciden.'); return; }
+  setAuthLoading(true);
+  setAuthMsg('');
+  const { data, error } = await supaClient.auth.signUp({ email, password: pass });
+  setAuthLoading(false);
+  if (error) { setAuthMsg(error.message); return; }
+  if (data.user && !data.session) {
+    setAuthMsg('¡Cuenta creada! Revisá tu email para confirmar la cuenta.', false);
+    return;
+  }
+  await onAuthSuccess(data.user);
+}
+
+async function authForgotPassword() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { setAuthMsg('Ingresá tu email arriba primero.'); return; }
+  const { error } = await supaClient.auth.resetPasswordForEmail(email);
+  if (error) { setAuthMsg(error.message); return; }
+  setAuthMsg('Email de recuperación enviado. Revisá tu casilla.', false);
+}
+
+async function authLogout() {
+  await supaClient.auth.signOut();
+  supaCurrentUser = null;
+  // Limpiar estado en memoria
+  applyStateFromJSON({ inventory: JSON.parse(JSON.stringify(DEFAULT_INV)), historial:[], retiros:[], cfg:{...CFG_DEFAULTS}, darkMode:false, pedidoLines:[], activeTab:'resumen' }, { clearPedido:true });
+  showAuthScreen();
+  showToast('Sesión cerrada.');
+}
+
+async function onAuthSuccess(user) {
+  supaCurrentUser = user;
+  const emailEl = document.getElementById('auth-user-email');
+  if (emailEl) emailEl.textContent = '👤 ' + user.email;
+  // Ocultar auth screen, mostrar loading mientras carga datos
+  const authEl = document.getElementById('auth-screen');
+  if (authEl) authEl.style.display = 'none';
+  setLoadingMsg('Cargando tu inventario...');
+  await supaLoadState();
+}
+
+// ── Cargar estado desde Supabase ─────────────────────────────
+async function supaLoadState() {
+  if (!supabase || !supaCurrentUser) return;
+  setSyncStatus('syncing', 'Cargando...');
+  let isNewUser = false;
+  try {
+    const { data, error } = await supaClient
+      .from('inventories')
+      .select('data')
+      .eq('user_id', supaCurrentUser.id)
+      .maybeSingle();
+    if (error) throw error;
+    if (data?.data) {
+      applyStateFromJSON(data.data, { clearPedido: false });
+      setSyncStatus('ok', 'Datos cargados');
+    } else {
+      // Usuario nuevo — inicializar vacío y mostrar onboarding
+      applyStateFromJSON({
+        inventory: [], historial: [], retiros: [],
+        cfg: {...CFG_DEFAULTS}, darkMode: false,
+        pedidoLines: [], activeTab: 'resumen'
+      }, { clearPedido: true });
+      setSyncStatus('ok', 'Bienvenido');
+      isNewUser = true;
+    }
+  } catch(e) {
+    console.error('[Tarmed] Error cargando datos:', e);
+    setSyncStatus('error', 'Error al cargar');
+    showToast('⚠ Error al cargar datos. Verificá tu conexión.', null, 6000);
+    return;
+  }
+  // Renderizar app
+  applyDark(); applyTheme(themeIdx);
+  buildThemeSwatches(); renderAll(); updateHistFilter();
+  syncConfigUI(); updateTitleBar();
+  // Mostrar el wrap y ocultar el loading
+  document.getElementById('main-wrap').style.display = '';
+  hideLoading();
+  // Onboarding para usuarios nuevos (sin inventario)
+  if (isNewUser) {
+    showOnboarding();
+  } else {
+    sTab(activeTab || 'resumen');
+    if (!localStorage.getItem('tarmed_tut_done')) {
+      setTimeout(startTutorial, 800);
+    }
+  }
+}
+
+// ── Guardar estado en Supabase ───────────────────────────────
+let supaSaveTimer = null;
+async function supaSaveState() {
+  if (!supabase || !supaCurrentUser) return;
+  setSyncStatus('syncing', 'Guardando...');
+  try {
+    const payload = getStorePayload();
+    const { error } = await supaClient
+      .from('inventories')
+      .upsert({ user_id: supaCurrentUser.id, data: payload },
+              { onConflict: 'user_id' });
+    if (error) throw error;
+    setSyncStatus('ok', 'Guardado');
+  } catch(e) {
+    console.error('[Tarmed] Error guardando:', e);
+    setSyncStatus('error', 'Error al guardar');
+    showToast('⚠ No se pudo guardar. Verificá tu conexión.', null, 5000);
+  }
+}
+
+// Importar JSON propio al crear cuenta (migración de datos existentes)
+async function supaImportFromJSON(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = async e => {
+    try {
+      const s = JSON.parse(e.target.result);
+      if (!s.inventory) throw new Error('Formato inválido');
+      applyStateFromJSON(s, { clearPedido: true });
+      await supaSaveState();
+      hideAuthScreen();
+      applyDark(); applyTheme(themeIdx);
+      buildThemeSwatches(); renderAll(); updateHistFilter();
+      syncConfigUI(); updateTitleBar();
+      sTab(activeTab || 'resumen');
+      showToast('✓ Datos importados y guardados en la nube.');
+    } catch(err) { setAuthMsg('Error al importar: ' + err.message); }
+  };
+  r.readAsText(f);
+  ev.target.value = '';
+}
+
+// ── Inicialización con verificación de sesión ────────────────
+async function initApp() {
+  // Esperar a que el SDK de Supabase esté disponible (máx 5s)
+  let attempts = 0;
+  while (typeof window.supabase === 'undefined' && attempts < 50) {
+    await new Promise(r => setTimeout(r, 100));
+    attempts++;
+  }
+  if (typeof window.supabase === 'undefined') {
+    setLoadingMsg('No se pudo cargar el SDK de Supabase. Verificá tu conexión a internet y recargá la página.');
+    return;
+  }
+  if (!initSupabase()) {
+    setLoadingMsg('Error al inicializar Supabase. Recargá la página.');
+    return;
+  }
+  setLoadingMsg('Verificando sesión...');
+  try {
+    const { data: { session }, error } = await supaClient.auth.getSession();
+    if (error) throw error;
+    if (session) {
+      await onAuthSuccess(session.user);
+    } else {
+      hideLoading();
+      showAuthScreen();
+    }
+  } catch(e) {
+    console.error('[Tarmed] Error en initApp:', e);
+    setLoadingMsg('Error de conexión: ' + (e.message || e) + '. Verificá tu internet y recargá.');
+  }
+  // Escuchar cambios de sesión
+  supaClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await onAuthSuccess(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      hideLoading();
+      showAuthScreen();
+    }
+  });
+}
+
 
 // ══ INVENTARIO TARMED — app.js ═════════════════════════════
 
@@ -964,13 +1301,13 @@ const TARMED_MAX_PER_LAB = 3; // máx. cajas por laboratorio por pedido
 const LABS=['Adium (Raffo)','Baliarda','Bagó','Casasco','Elea','Gador','Roemmers'];
 const COMPS_OPTS=[10,20,28,30,50,60];
 const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const BASE_GROUPS={'Antidepresivos':{badge:'b-blue',color:'#2E7DBD'},'Antipsicóticos':{badge:'b-teal',color:'#1A9070'},'Benzodiacepinas':{badge:'b-amber',color:'#C88A18'},'Estabilizadores del ánimo':{badge:'b-purple',color:'#6850C0'},'Compuestos Z / Otros':{badge:'b-gray',color:'#5A7060'}};
+const BASE_GROUPS={'Antidepresivos':{badge:'b-blue',color:'#2E7DBD',icon:'🌀'},'Antipsicóticos':{badge:'b-teal',color:'#1A9070',icon:'🧠'},'Benzodiacepinas':{badge:'b-amber',color:'#C88A18',icon:'🌙'},'Estabilizadores del ánimo':{badge:'b-purple',color:'#6850C0',icon:'⚡'},'Compuestos Z / Otros':{badge:'b-gray',color:'#5A7060',icon:'💊'}};
 let GROUPS=Object.assign({},BASE_GROUPS);
 const EXTRA_BADGE_COLORS=[['b-blue','#2E7DBD'],['b-teal','#1A9070'],['b-amber','#C88A18'],['b-purple','#6850C0'],['b-gray','#5A7060'],['b-acc','#2E7A44'],['b-red-s','#C04040'],['b-green','#1A6020']];
 function getOrAddGroup(name){if(!name)return'Compuestos Z / Otros';if(GROUPS[name])return name;const idx=Object.keys(GROUPS).length%EXTRA_BADGE_COLORS.length;const[badge,color]=EXTRA_BADGE_COLORS[idx];GROUPS[name]={badge,color};return name;}
 const LCOLS=['#2E7DBD','#1A9070','#C88A18','#6850C0','#C05050','#5A7060','#A0608A','#3090A8'];
-const STORE_KEY='tarmed_v49';
-const APP_VERSION='v49';
+const STORE_KEY='tarmed_v52';
+const APP_VERSION='v52';
 const THEMES=[
   {name:'Verde salvia',cls:'',bg:'#EEF5EE',accent:'#2E7A44'},
   {name:'Lavanda',cls:'th-lavanda',bg:'#F2EEF8',accent:'#6840B8'},
@@ -1162,6 +1499,8 @@ function getStorePayload() {
 let lineCounter=0,VEN_ALERT_DAYS=180,venSort='group',undoRetiro=null;
 function newLineId(){return ++lineCounter;}
 // ══ PERSISTENCIA ════════════════════════════════════════
+// loadState: solo usada internamente por obImport y testing.
+// En producción, supaLoadState() reemplaza este flujo.
 function loadState() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -1218,6 +1557,9 @@ function markUnsaved(){
 function saveState(){
   markUnsaved();
   clearTimeout(saveTimer);
+  // Debounce para Supabase (400ms local visual + 1s para la nube)
+  clearTimeout(supaSaveTimer);
+  if (supaCurrentUser) supaSaveTimer = setTimeout(() => supaSaveState(), 1000);
   saveTimer=setTimeout(()=>{
     try{
       const payload=JSON.stringify(getStorePayload());
@@ -1251,7 +1593,14 @@ function saveState(){
     }
   },400);
 }
-function clearStorage(){if(!confirm('¿Borrar todos los datos guardados?'))return;localStorage.removeItem(STORE_KEY);resetToDefaults(false);}
+function clearStorage(){
+  showConfirm(
+    'Borrar datos guardados',
+    'Se eliminarán todos los datos del localStorage. Podés reimportar tu JSON en cualquier momento.',
+    () => { localStorage.removeItem(STORE_KEY); resetToDefaults(false); },
+    'Borrar', true
+  );
+}
 function applyDark(){document.body.classList.toggle('dark',darkMode);document.getElementById('dark-btn').classList.toggle('on',darkMode);}
 function togDark(){darkMode=!darkMode;STORE.darkMode=darkMode;applyDark();saveState();}
 function toggleLargeText(on) {
@@ -1345,7 +1694,7 @@ function printInventario() {
   win.print();
 }
 function exportPedidoPDF(){
-  const items=buildPedidoItems();if(!items.length){alert('Armá el pedido primero.');return;}
+  const items=buildPedidoItems();if(!items.length){showToast('⚠ Armá el pedido primero.'); return; }
   const mes=MESES[parseInt(document.getElementById('ped-mes').value)-1];
   const anio=document.getElementById('ped-anio').value;
   const num=document.getElementById('ped-num').value;
@@ -2029,8 +2378,8 @@ function buildQuickRowHTML(m, realIdx) {
       </div>
       <span class="sp ${stockClass(tot, totMin)}" style="font-size:14px;font-weight:700">${tot}</span>
       <div style="display:flex;gap:4px">
-        <button onclick="quickDispense(${realIdx})" style="border:none;background:var(--ac);color:#fff;cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap" title="Dispensar 1 caja ahora">1 caja</button>
-        <button onclick="openQD(${realIdx},0)" style="border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:11px;padding:5px 10px;border-radius:var(--rsm);font-weight:600;white-space:nowrap" title="Dispensar con detalle">💉</button>
+        <button onclick="quickDispense(${realIdx})" class="btn-quick-1caja" title="Dispensar 1 caja ahora">1 caja</button>
+        <button onclick="openQD(${realIdx},0)" class="btn-quick-disp" title="Dispensar con detalle">💉</button>
       </div>
     </div>`;
 }
@@ -2038,7 +2387,15 @@ function quickDispense(mi) {
   const m = inventory[mi];
   if (!m || !m.lots.length) return;
   // Elegir el lote con más stock disponible
-  const l = m.lots.reduce((best, cur) => cur.qty > (best?.qty||0) ? cur : best, null);
+  // FEFO: primer vencimiento primero (si hay qty), sino el de más stock
+  const withQty = m.lots.filter(l => l.qty > 0);
+  const l = withQty.length
+    ? withQty.reduce((best, cur) => {
+        const bd = daysToVen(best.ven) ?? 9999;
+        const cd = daysToVen(cur.ven)  ?? 9999;
+        return cd < bd ? cur : best;
+      }, withQty[0])
+    : m.lots[0];
   if (!l || l.qty < 1) { showToast('⚠ Sin stock disponible.'); return; }
   const hoy = new Date().toISOString().slice(0,10);
   if (doDispensacion(m, l, 1, hoy, '', '')) {
@@ -2110,7 +2467,7 @@ function buildMedRowHTML(m, realIdx) {
         <div class="inv-med-name">
           <span>${m.name}</span>
           <span class="badge ${GROUPS[m.group].badge}" style="font-size:9px">${m.group}</span>
-          <button onclick="prefillarAgregar('${m.name}','${m.group}')" style="margin-left:auto;font-size:9px;padding:1px 7px;border:1px solid var(--bdl);border-radius:3px;background:var(--ps);color:var(--tm);cursor:pointer;white-space:nowrap" title="Agregar lote de otro laboratorio">+ Lote</button>
+          <button onclick="prefillarAgregar('${m.name}','${m.group}')" class="btn-inline-ghost" title="Agregar lote de otro laboratorio">+ Lote</button>
         </div>
         <div class="inv-lots">${chips}</div>
         ${obsHTML}
@@ -2164,7 +2521,13 @@ function renderInventory() {
   if (sel) sel.addEventListener('change', () => setFilter(sel.value));
 
   let filtered = (activeFilter === 'Todos' ? [...inventory] : [...inventory.filter(m => m.group === activeFilter)]).filter(m => !m.archived);
-  if (q) filtered = filtered.filter(m => m.name.toLowerCase().includes(q.toLowerCase()));
+  if (q) filtered = filtered.filter(m =>
+    m.name.toLowerCase().includes(q.toLowerCase()) ||
+    m.lots.some(l =>
+      String(l.dose).includes(q) ||
+      (l.lab||'').toLowerCase().includes(q.toLowerCase())
+    )
+  );
   const favs = cfg.favoritos || [];
   filtered = filtered
     .map(m => ({ m, realIdx: inventory.indexOf(m) }))
@@ -2295,6 +2658,7 @@ function openQD(mi,li){
       <div><label class="fl">Paciente / Cama (opcional)</label><input type="text" id="qd-pac" placeholder="ej. Cama 4, J.G., …" autocomplete="off"></div>
       <div><label class="fl">Dispensado por</label><select id="qd-res" style="font-size:12px">${resOptions}</select></div>
     </div>
+    <div><label class="fl">Nota (opcional)</label><input type="text" id="qd-nota" placeholder="ej. reposición guardia, stock enfermería…" autocomplete="off"></div>
     ${l.ven&&daysToVen(l.ven)<0?'<div style="margin-top:8px;padding:7px 11px;background:var(--rb);border-radius:var(--rsm);font-size:11px;color:var(--rt);font-weight:500">⚠ Este lote está VENCIDO.</div>':''}`;
   document.getElementById('qd-confirm-btn').onclick=confirmQD;
   document.getElementById('qd-modal').style.display='block';
@@ -2307,7 +2671,8 @@ function confirmQD(){
   const fecha=document.getElementById('qd-fecha').value;
   const pac=document.getElementById('qd-pac').value.trim();
   const res=document.getElementById('qd-res')?.value||'';
-  if(doDispensacion(m,l,qty,fecha,pac,res))closeQD();
+  const nota=document.getElementById('qd-nota')?.value.trim()||'';
+  if(doDispensacion(m,l,qty,fecha,pac,res,nota))closeQD();
 }
 
 // EXPORT RETIROS CSV (mes actual)
@@ -2561,7 +2926,7 @@ function renderPedidoList(){updateTbarSummary();
 
 function addLine(name, dose) {
   if (getPedTotal() >= TARMED_MAX_TOTAL) {
-    alert(`Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return;
+    showToast(`⚠ Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return; return;
   }
   const m         = inventory.find(x => x.name === name);
   const usedLabs  = pedidoLines.filter(l => l.name === name && l.dose === dose).map(l => l.lab);
@@ -2576,7 +2941,7 @@ function setLineLab(lineId, lab) {
   if (lab && line.qty > 0) {
     const labTot = getLabTotal(lab) - (line.lab === lab ? line.qty : 0) + line.qty;
     if (labTot > TARMED_MAX_PER_LAB) {
-      alert(`Máximo ${TARMED_MAX_PER_LAB} cajas por laboratorio (${lab}).`);
+      showToast(`⚠ Máximo ${TARMED_MAX_PER_LAB} cajas por laboratorio (${lab}).`); return;
       setTimeout(() => {
         const el = document.querySelector(`#pl-${lineId} .lab-sel-sm`);
         if (el) el.value = line.lab;
@@ -2593,15 +2958,15 @@ function chgLine(lineId, delta) {
   const nv = Math.max(0, line.qty + delta);
   if (delta > 0) {
     if (getPedTotal() >= TARMED_MAX_TOTAL) {
-      alert(`Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return;
+      showToast(`⚠ Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return; return;
     }
     if (nv > TARMED_MAX_PER_LAB) {
-      alert(`Máximo ${TARMED_MAX_PER_LAB} cajas por línea.`); return;
+      showToast(`⚠ Máximo ${TARMED_MAX_PER_LAB} cajas por línea.`); return; return;
     }
     if (line.lab) {
       const labTot = getLabTotal(line.lab) - line.qty + nv;
       if (labTot > TARMED_MAX_PER_LAB) {
-        alert(`Máximo ${TARMED_MAX_PER_LAB} cajas por laboratorio (${line.lab}).`); return;
+        showToast(`⚠ Máximo ${TARMED_MAX_PER_LAB} cajas por laboratorio (${line.lab}).`); return;
       }
     }
   }
@@ -2732,7 +3097,7 @@ function confirmarPedido() {
   const num  = parseInt(document.getElementById('ped-num').value);
   const upd  = document.getElementById('chk-stock').checked;
   const items = buildPedidoItems();
-  if (!items.length) { alert('Seleccioná al menos un ítem.'); return; }
+  if (!items.length) { showToast('⚠ Seleccioná al menos un ítem.'); return; }
   if (upd) applyPedidoToStock(items);
   historial.push({
     num, mes, anio, mesNombre: MESES[mes - 1],
@@ -2778,18 +3143,37 @@ function renderHistorial(){
 }
 function duplicarPedido(idx) {
   const h = historial[idx];
-  if (!confirm(`¿Cargar pedido #${h.num} (${h.mesNombre} ${h.anio}) como plantilla?`)) return;
-  pedidoLines = []; lineCounter = 0;
-  h.items.forEach(i => {
-    if (getPedTotal() >= TARMED_MAX_TOTAL) return;
-    const add = Math.min(i.cajas, TARMED_MAX_TOTAL - getPedTotal(), TARMED_MAX_PER_LAB);
-    if (add > 0)
-      pedidoLines.push({ lineId: newLineId(), name: i.name, dose: i.dose,
-        lab: i.lab === 'Sin lab' ? '' : i.lab, qty: add });
-  });
-  sTab('pedido'); saveState(); renderPedido(); updatePedidoBadge();
+  showConfirm(
+    'Cargar como plantilla',
+    `Pedido #${h.num} — ${h.mesNombre} ${h.anio}. Se cargará como base del pedido actual.`,
+    () => {
+      pedidoLines = []; lineCounter = 0;
+      h.items.forEach(i => {
+        if (getPedTotal() >= TARMED_MAX_TOTAL) return;
+        const add = Math.min(i.cajas, TARMED_MAX_TOTAL - getPedTotal(), TARMED_MAX_PER_LAB);
+        if (add > 0)
+          pedidoLines.push({ lineId: newLineId(), name: i.name, dose: i.dose,
+            lab: i.lab === 'Sin lab' ? '' : i.lab, qty: add });
+      });
+      sTab('pedido'); saveState(); renderPedido(); updatePedidoBadge();
+      showToast('✓ Pedido cargado como plantilla.');
+    },
+    'Cargar', false
+  );
 }
-function deleteOrder(idx){if(!confirm(`¿Eliminar pedido #${historial[idx].num}?`))return;historial.splice(idx,1);saveState();updateHistFilter();renderHistorial();}
+function deleteOrder(idx) {
+  const h = historial[idx];
+  showConfirm(
+    'Eliminar pedido del historial',
+    `Pedido #${h.num} — ${h.mesNombre} ${h.anio} · ${h.total} cajas. Esta acción no se puede deshacer.`,
+    () => {
+      historial.splice(idx, 1);
+      saveState(); updateHistFilter(); renderHistorial();
+      showToast('🗑 Pedido eliminado del historial.');
+    },
+    'Eliminar', true
+  );
+}
 function buildEditModalItems(h) {
   return h.items.map((item, ii) => `
     <div class="lrow">
@@ -3235,6 +3619,36 @@ function scrollToAnalisisSection(id) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function renderResidentesStats() {
+  const el = document.getElementById('residentes-stats');
+  if (!el) return;
+  // Solo relevante si hay datos con residente
+  const conRes = retiros.filter(r => r.residente);
+  if (!conRes.length) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--tm);padding:8px 0">Sin datos de residente. Activá multiusuario en Configuración y registrá dispensaciones con nombre.</p>';
+    return;
+  }
+  // Agrupar por residente
+  const byRes = {};
+  conRes.forEach(r => {
+    if (!byRes[r.residente]) byRes[r.residente] = { total: 0, cajas: 0, meds: {} };
+    byRes[r.residente].total++;
+    byRes[r.residente].cajas += r.qty;
+    byRes[r.residente].meds[r.name] = (byRes[r.residente].meds[r.name] || 0) + r.qty;
+  });
+  const sorted = Object.entries(byRes).sort((a, b) => b[1].total - a[1].total);
+  el.innerHTML = sorted.map(([nombre, d]) => {
+    const topMeds = Object.entries(d.meds).sort((a,b) => b[1]-a[1]).slice(0,3)
+      .map(([n,q]) => `${n} (${q})`).join(', ');
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--bdl)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:600">👤 ${nombre}</span>
+        <span style="font-size:11px;color:var(--tm)">${d.total} dispensación${d.total!==1?'es':''} · ${d.cajas} caja${d.cajas!==1?'s':''}</span>
+      </div>
+      <div style="font-size:11px;color:var(--tm);margin-top:3px">Más dispensados: ${topMeds}</div>
+    </div>`;
+  }).join('');
+}
 function renderAuditLog() {
   const el = document.getElementById('audit-list');
   if (!el) return;
@@ -3277,6 +3691,7 @@ function renderAnalisis() {
     lgSel.addEventListener('change', () => renderLabGrp());
   }
   renderLabGrp();
+  renderResidentesStats();
   renderAuditLog();
 }
 // ══ RENDER: GRÁFICOS ════════════════════════════════════
@@ -3477,7 +3892,7 @@ function renderIntra() {
       scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 }
-function renderIntra(){const g=document.getElementById('intra-sel').value;if(!g)return;const meds=inventory.filter(m=>m.group===g);const labels=meds.map(m=>m.name),vals=meds.map(m=>totalStock(m)),color=GROUPS[g].color;const h=Math.max(100,meds.length*36+50);document.getElementById('intra-wrap').innerHTML=`<div style="position:relative;height:${h}px"><canvas id="ch-intra"></canvas></div>`;dC(cIntra);cIntra=new Chart(document.getElementById('ch-intra'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:color+'AA',borderColor:color,borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}}});}
+// renderIntra: ver definición canónica arriba}
 // AGREGAR / EDITAR
 // ══ RENDER: AGREGAR / EDITAR ════════════════════════════
 function togNewCustom(){document.getElementById('new-lab-c').style.display=document.getElementById('new-lab').value==='__otro__'?'block':'none';}
@@ -3717,20 +4132,7 @@ function addMed() {
   showToast(`✓ ${f.name} ${f.dose}mg${f.lab?' ('+f.lab+')':''}${ven?' v.'+ven:''} agregado.`);
 }
 // ══ ACCIONES DE LOTE ════════════════════════════════════
-function remLot(mi,li){
-  const m=inventory[mi]; const l=m?.lots[li];
-  if(!m||!l) return;
-  showConfirm(
-    'Eliminar lote',
-    m.name + ' ' + l.dose + 'mg' + (l.lab?' ('+l.lab+')':'') + ' — Stock actual: ' + l.qty + ' caja' + (l.qty!==1?'s':''),
-    () => {
-      inventory[mi].lots.splice(li,1);
-      if(!inventory[mi].lots.length) inventory.splice(mi,1);
-      saveState(); renderEditList(); renderResumen(); renderInventory(); renderVencimientos();
-      showToast('Lote eliminado.');
-    }
-  );
-}
+// remLot: ver definición canónica abajo
 // ══ SANITY CHECK ═════════════════════════════════════════
 function sanityCheck(){
   const required=['main-wrap','metrics-grid','inventory-list','historial-list','retiros-list',
@@ -3865,22 +4267,7 @@ function remLot(mi,li){
     showToast('↩ Lote restaurado');
   },5000);
 }
-// ── AJUSTE MANUAL CON LOG ─────────────────────────────────────
-function adjStock(mi,li,delta){
-  const m=inventory[mi];const l=m?.lots[li];if(!l)return;
-  const prev=l.qty;
-  l.qty=Math.max(0,l.qty+delta);
-  if(l.qty===prev)return;
-  // Log as "ajuste manual" in retiros
-  const today=new Date().toISOString().slice(0,10);
-  if(delta<0){
-    retiros.unshift({fecha:today,name:m.name,dose:l.dose,lab:l.lab||'',ven:l.ven||'',qty:Math.abs(delta),group:m.group,paciente:'[ajuste manual]'});
-  } else {
-    // Stock addition: log inversely as a note but don't deduct — just save
-    retiros.unshift({fecha:today,name:m.name,dose:l.dose,lab:l.lab||'',ven:l.ven||'',qty:-Math.abs(delta),group:m.group,paciente:'[entrada manual]'});
-  }
-  saveState();renderInventory();renderResumen();renderVencidosBanner();updateRetFiltros();
-}
+// adjStock: ver definición canónica arriba
 // ── DUPLICAR LOTE ─────────────────────────────────────────────
 function dupLot(mi,li){
   const m=inventory[mi];const l=m?.lots[li];if(!m||!l)return;
@@ -4097,49 +4484,29 @@ const todayDate=new Date();
 document.getElementById('ret-fecha').value=todayDate.toISOString().slice(0,10);
 const selMes=document.getElementById('ped-mes');MESES.forEach((m,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=m;if(i===todayDate.getMonth())o.selected=true;selMes.appendChild(o);});
 document.addEventListener('DOMContentLoaded', function() {
-const isFirstUse=!localStorage.getItem(STORE_KEY);
-loadState();
-applyDark();
-applyTheme(themeIdx);
-// Ceder un frame al browser para pintar el esqueleto (topbar, nav)
-// antes de ejecutar los renders pesados — elimina flash de pantalla en blanco
-requestAnimationFrame(() => {
-  buildThemeSwatches();
-  syncConfigUI();
-  updateTitleBar();
-  renderAll();
-  updateHistFilter();
-  initRetSelects();
-  renderTarmedChip();
-  updatePedidoBadge();
-  updateGroupDatalist();
-  initVersionBadge();
-  if(pedidoLines.length>0) renderPedido();
-  // Mostrar siempre el onboarding al abrir
-  // Si hay datos existentes, mostrar desde step 1 (no desde el paso de nombre)
-  if (isFirstUse) {
-    showOnboarding(); // step 0: configurar nombre
-  } else {
-    showOnboardingReturning(); // step 1: usuario existente
-  }
-  setTimeout(sanityCheck,200);
-  // Registrar Service Worker para PWA (instalable en móvil)
-  if ('serviceWorker' in navigator) {
-    const swCode = `
-const CACHE='tarmed-v46';
-const ASSETS=[location.pathname||'/'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));
-self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const rc=res.clone();caches.open(CACHE).then(c=>c.put(e.request,rc));return res;}))));
-`;
-    const blob = new Blob([swCode], {type:'text/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
-  }
-});
+  initApp();
 });
 
 // ══ HELPERS DE ONCLICK (topbar y global) ════════════════════
+function exportAndCloseMenu()   { exportJSON();       closeTopbarMenu(); }
+function printAndCloseMenu()    { printInventario();  closeTopbarMenu(); }
+function csvAndCloseMenu()      { exportCSV();        closeTopbarMenu(); }
+function clearGlobalSearch()    {
+  const q = document.getElementById('global-q');
+  if (q) { q.value = ''; globalSearch(); }
+}
+function goBack() {
+  if (tabHistory.length === 0) return;
+  const prev = tabHistory.pop();
+  sTab(prev);
+  tabHistory.pop();
+  updateBackBtn();
+}
+function updateBackBtn() {
+  const btn = document.getElementById('back-btn');
+  if (!btn) return;
+  btn.style.display = tabHistory.length > 0 ? 'flex' : 'none';
+}
 function showConfirm(title, msg, onOk, okLabel='Eliminar', danger=true) {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-msg').textContent   = msg;
@@ -4152,36 +4519,6 @@ function showConfirm(title, msg, onOk, okLabel='Eliminar', danger=true) {
 function closeConfirm() {
   document.getElementById('confirm-modal').style.display = 'none';
 }
-// ══ HELPERS DE ONCLICK (topbar y global) ════════════════════
-function goBack() {
-  if (tabHistory.length === 0) return;
-  const prev = tabHistory.pop();
-  // sTab ya empuja al historial — evitar loop: limpiar la última entrada
-  sTab(prev);
-  tabHistory.pop(); // quitar la entrada que sTab acaba de agregar
-  updateBackBtn();
-}
-function updateBackBtn() {
-  const btn = document.getElementById('back-btn');
-  if (!btn) return;
-  btn.style.display = tabHistory.length > 0 ? 'flex' : 'none';
-}
-function exportAndCloseMenu()   { exportJSON();       closeTopbarMenu(); }
-function printAndCloseMenu()    { printInventario();  closeTopbarMenu(); }
-function csvAndCloseMenu()      { exportCSV();        closeTopbarMenu(); }
-function toggleTbar() {
-  const body  = document.getElementById('tbar-body');
-  const arrow = document.getElementById('tbar-arrow');
-  if (!body) return;
-  const open = body.style.display === 'none';
-  body.style.display = open ? '' : 'none';
-  if (arrow) arrow.textContent = open ? '▾' : '▸';
-}
-function clearGlobalSearch()    {
-  const q = document.getElementById('global-q');
-  if (q) { q.value = ''; globalSearch(); }
-}
-
 // ══ EVENT LISTENERS (sin inline handlers) ═════════════════
 (function bindEvents() {
   // Inventario: buscar medicamento
@@ -4356,15 +4693,16 @@ function registrarRetiro() {
     }, 5000);
 }
 
-function doDispensacion(m, l, qty, fecha, paciente, residente) {
+function doDispensacion(m, l, qty, fecha, paciente, residente, nota) {
   if (!m || !l) return false;
   if (l.qty < qty) { showToast(`⚠ Stock insuficiente — solo hay ${l.qty} caja${l.qty!==1?'s':''}.`); return false; }
   l.qty -= qty;
   const entry = { fecha, name: m.name, dose: l.dose, lab: l.lab||'', ven: l.ven||'',
-    qty, group: m.group, paciente: paciente||'', residente: residente||'' };
+    qty, group: m.group, paciente: paciente||'', residente: residente||'', nota: nota||'' };
   retiros.unshift(entry);
   saveState(); updateRetFiltros(); renderRetiros(); renderResumen();
   renderInventory(); renderVencidosBanner(); updatePacienteDatalist(); updateLastEventBar();
+  const _shareText = `${m.name} ${l.dose}mg × ${qty} caja${qty!==1?'s':''}${paciente?' → '+paciente:''}${residente?' por '+residente:''} (${fecha} ${new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}hs)`;
   showToast(`✓ ${m.name} ${l.dose}mg × ${qty} dispensado${paciente?' a '+paciente:''}`,
     () => {
       l.qty += qty; retiros.splice(retiros.indexOf(entry), 1);
@@ -4372,16 +4710,32 @@ function doDispensacion(m, l, qty, fecha, paciente, residente) {
       renderInventory(); renderVencidosBanner();
       showToast('↩ Dispensación revertida');
     }, 5000);
+  if (navigator.share) {
+    setTimeout(() => {
+      const tw = document.querySelector('.toast');
+      if (!tw) return;
+      const btn = document.createElement('button');
+      btn.textContent = '📤';
+      btn.title = 'Compartir dispensación';
+      btn.style.cssText = 'border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:13px;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle';
+      btn.onclick = e => { e.stopPropagation(); navigator.share({title:'Dispensación',text:_shareText}).catch(()=>{}); };
+      tw.appendChild(btn);
+    }, 80);
+  }
   return true;
 }
 
 function renderRetiros(resetPage=true) {
   if (resetPage) dispPage = 0;
-  const medF = document.getElementById('ret-filter-med')?.value || '';
-  const mesF = document.getElementById('ret-filter-mes')?.value || '';
+  const medF   = document.getElementById('ret-filter-med')?.value   || '';
+  const mesF   = document.getElementById('ret-filter-mes')?.value   || '';
+  const desdeF = document.getElementById('ret-filter-desde')?.value || '';
+  const hastaF = document.getElementById('ret-filter-hasta')?.value || '';
   let filtered = retiros.filter(r => {
-    if (medF && r.name !== medF) return false;
-    if (mesF && !r.fecha.startsWith(mesF)) return false;
+    if (medF   && r.name !== medF)           return false;
+    if (mesF   && !r.fecha.startsWith(mesF)) return false;
+    if (desdeF && r.fecha < desdeF)          return false;
+    if (hastaF && r.fecha > hastaF)          return false;
     return true;
   });
   document.getElementById('ret-total-label').textContent =
@@ -4402,7 +4756,7 @@ function renderRetiros(resetPage=true) {
         <div style="flex:1">
           <span style="font-size:13px;font-weight:600">${r.name} ${r.dose}mg</span>
           ${r.lab?`<span class="badge b-gray" style="margin-left:4px;font-size:9px">${r.lab}</span>`:''}
-          <div style="font-size:11px;color:var(--tm)">${r.fecha} <span style="color:var(--ac);font-size:10px">${relativeDate(r.fecha)}</span>${extra?' · '+extra:''} · ${r.qty} caja${r.qty!==1?'s':''}</div>
+          <div style="font-size:11px;color:var(--tm)">${r.fecha} <span style="color:var(--ac);font-size:10px">${relativeDate(r.fecha)}</span>${extra?' · '+extra:''} · ${r.qty} caja${r.qty!==1?'s':''}${r.nota?' · <em>'+r.nota+'</em>':''}</div>
         </div>
         <span class="badge ${badge}" style="font-size:9px">${r.group}</span>
         <button class="delbtn no-print" onclick="delRetiro(${realIdx})">×</button>
@@ -4421,6 +4775,67 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
+
+
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <span>💊</span>
+      <h1>Inventario Tarmed</h1>
+      <p>Psicofármacos · Registro seguro en la nube</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="authSwitchTab('login')">Ingresar</button>
+      <button class="auth-tab" id="tab-register" onclick="authSwitchTab('register')">Registrarse</button>
+    </div>
+    <!-- Login -->
+    <div id="auth-login">
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <span class="auth-forgot" onclick="authForgotPassword()">¿Olvidaste tu contraseña?</span>
+      <button class="auth-btn" id="login-btn" onclick="authLogin()">Ingresar</button>
+    </div>
+    <!-- Register -->
+    <div id="auth-register" style="display:none">
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Contraseña (mínimo 6 caracteres)</label>
+        <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="auth-field">
+        <label>Confirmar contraseña</label>
+        <input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="auth-btn" id="reg-btn" onclick="authRegister()">Crear cuenta</button>
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+    <hr class="auth-divider">
+    <div style="font-size:11px;color:var(--tm);text-align:center;margin-bottom:8px">
+      ¿Ya tenés un inventario guardado en JSON?
+    </div>
+    <label style="display:block;text-align:center;font-size:12px;color:var(--ac);cursor:pointer;font-weight:600">
+      📂 Importar JSON existente
+      <input type="file" accept=".json" onchange="supaImportFromJSON(event)"
+             style="display:none">
+    </label>
+  </div>
+</div>
+
+
+
+
 
 <!-- CONFIRM MODAL -->
 <div class="mbd" id="confirm-modal" style="z-index:500">
