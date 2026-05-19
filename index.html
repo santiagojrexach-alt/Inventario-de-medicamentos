@@ -1068,10 +1068,8 @@ function setSyncStatus(status, msg) {
 function showAuthScreen() {
   console.log('[Tarmed] showAuthScreen llamado');
   const el = document.getElementById('auth-screen');
-  console.log('[Tarmed] auth-screen element:', el);
   if (el) {
-    el.style.display = 'flex';
-    el.classList.add('visible');
+    el.setAttribute('style', 'display:flex!important;position:fixed;inset:0;background:#EEF5EE;z-index:600;align-items:center;justify-content:center;padding:20px');
   }
   const wrap = document.getElementById('main-wrap');
   if (wrap) wrap.style.display = 'none';
@@ -4811,62 +4809,66 @@ function loadMoreRetiros() {
 
 
 <!-- AUTH SCREEN -->
-<div id="auth-screen" style="display:none;position:fixed;inset:0;background:#EEF5EE;z-index:600;align-items:center;justify-content:center;padding:20px">
-  <div class="auth-box" style="background:#ffffff;border:1px solid #b0cca8;border-radius:14px;padding:32px 28px;width:min(400px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.12);box-sizing:border-box">
-    <div class="auth-logo">
-      <span>💊</span>
-      <h1>Inventario Tarmed</h1>
-      <p>Psicofármacos · Registro seguro en la nube</p>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="authSwitchTab('login')">Ingresar</button>
-      <button class="auth-tab" id="tab-register" onclick="authSwitchTab('register')">Registrarse</button>
-    </div>
-    <!-- Login -->
-    <div id="auth-login">
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email">
+<div id="auth-screen" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF5EE;z-index:600;overflow-y:auto">
+  <div style="min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box">
+    <div id="auth-box-inner" style="background:#ffffff;border:1px solid #b0cca8;border-radius:14px;padding:32px 28px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.12);box-sizing:border-box">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:36px">💊</div>
+        <h1 style="font-size:18px;font-weight:700;color:#1A2E18;margin:8px 0 4px;font-family:inherit">Inventario Tarmed</h1>
+        <p style="font-size:12px;color:#5A7855;font-family:inherit">Psicofármacos · Registro seguro en la nube</p>
       </div>
-      <div class="auth-field">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      <div style="display:flex;background:#E2EEE2;border-radius:6px;padding:3px;margin-bottom:20px;gap:2px">
+        <button id="tab-login" onclick="authSwitchTab('login')"
+          style="flex:1;padding:7px;border:none;background:#ffffff;border-radius:3px;font-size:13px;cursor:pointer;color:#1A2E18;font-weight:500;font-family:inherit">Ingresar</button>
+        <button id="tab-register" onclick="authSwitchTab('register')"
+          style="flex:1;padding:7px;border:none;background:none;border-radius:3px;font-size:13px;cursor:pointer;color:#5A7855;font-weight:500;font-family:inherit">Registrarse</button>
       </div>
-      <span class="auth-forgot" onclick="authForgotPassword()">¿Olvidaste tu contraseña?</span>
-      <button class="auth-btn" id="login-btn" onclick="authLogin()">Ingresar</button>
+      <div id="auth-login">
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px;font-family:inherit">Email</label>
+          <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"
+            style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;background:#EEF5EE;color:#1A2E18;box-sizing:border-box;font-family:inherit">
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px;font-family:inherit">Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+            style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;background:#EEF5EE;color:#1A2E18;box-sizing:border-box;font-family:inherit">
+        </div>
+        <div style="text-align:right;margin-bottom:12px">
+          <span onclick="authForgotPassword()" style="font-size:11px;color:#2E7A44;cursor:pointer;font-family:inherit">¿Olvidaste tu contraseña?</span>
+        </div>
+        <button id="login-btn" onclick="authLogin()"
+          style="width:100%;padding:11px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Ingresar</button>
+      </div>
+      <div id="auth-register" style="display:none">
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px;font-family:inherit">Email</label>
+          <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email"
+            style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;background:#EEF5EE;color:#1A2E18;box-sizing:border-box;font-family:inherit">
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px;font-family:inherit">Contraseña (mínimo 6 caracteres)</label>
+          <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"
+            style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;background:#EEF5EE;color:#1A2E18;box-sizing:border-box;font-family:inherit">
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px;font-family:inherit">Confirmar contraseña</label>
+          <input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password"
+            style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;background:#EEF5EE;color:#1A2E18;box-sizing:border-box;font-family:inherit">
+        </div>
+        <button id="reg-btn" onclick="authRegister()"
+          style="width:100%;padding:11px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Crear cuenta</button>
+      </div>
+      <div id="auth-msg" style="font-size:12px;text-align:center;margin-top:12px;min-height:18px;font-family:inherit"></div>
+      <hr style="border:none;border-top:1px solid #b0cca8;margin:16px 0">
+      <div style="font-size:11px;color:#5A7855;text-align:center;margin-bottom:8px;font-family:inherit">¿Ya tenés un inventario guardado en JSON?</div>
+      <label style="display:block;text-align:center;font-size:12px;color:#2E7A44;cursor:pointer;font-weight:600;font-family:inherit">
+        📂 Importar JSON existente
+        <input type="file" accept=".json" onchange="supaImportFromJSON(event)" style="display:none">
+      </label>
     </div>
-    <!-- Register -->
-    <div id="auth-register" style="display:none">
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label>Contraseña (mínimo 6 caracteres)</label>
-        <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password">
-      </div>
-      <div class="auth-field">
-        <label>Confirmar contraseña</label>
-        <input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password">
-      </div>
-      <button class="auth-btn" id="reg-btn" onclick="authRegister()">Crear cuenta</button>
-    </div>
-    <div class="auth-msg" id="auth-msg"></div>
-    <hr class="auth-divider">
-    <div style="font-size:11px;color:var(--tm);text-align:center;margin-bottom:8px">
-      ¿Ya tenés un inventario guardado en JSON?
-    </div>
-    <label style="display:block;text-align:center;font-size:12px;color:var(--ac);cursor:pointer;font-weight:600">
-      📂 Importar JSON existente
-      <input type="file" accept=".json" onchange="supaImportFromJSON(event)"
-             style="display:none">
-    </label>
   </div>
 </div>
-
-
-
-
 
 <!-- CONFIRM MODAL -->
 <div class="mbd" id="confirm-modal" style="z-index:500">
