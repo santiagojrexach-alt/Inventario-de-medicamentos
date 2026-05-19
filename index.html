@@ -387,8 +387,9 @@ button:hover{background:var(--ps)}
 .row-info-sm{font-size:11px;color:var(--tm);white-space:nowrap}
 
 /* ── Pantalla de autenticación ──────────────────────────────── */
-#auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:600;
+#auth-screen{display:none;position:fixed;inset:0;background:#EEF5EE;z-index:600;
   align-items:center;justify-content:center;padding:20px}
+#auth-screen.visible{display:flex}
 .auth-box{background:var(--pc);border:1px solid var(--bd);border-radius:var(--rlg);
   padding:32px 28px;width:min(400px,100%);box-shadow:0 8px 32px rgba(0,0,0,.12)}
 .auth-logo{text-align:center;margin-bottom:24px}
@@ -1030,6 +1031,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1038,11 +1040,14 @@ let supaClient = null;
 let supaCurrentUser = null;
 
 function initSupabase() {
+  if (supaClient) return true; // ya inicializado
   if (typeof window.supabase === 'undefined') {
     console.error('[Tarmed] Supabase SDK no cargado');
     return false;
   }
-  supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
   return true;
 }
 
@@ -1061,11 +1066,18 @@ function setSyncStatus(status, msg) {
 
 // ── Auth: pantalla de login ──────────────────────────────────
 function showAuthScreen() {
+  console.log('[Tarmed] showAuthScreen llamado');
   const el = document.getElementById('auth-screen');
-  if (el) el.style.display = 'flex';
-  document.getElementById('main-wrap').style.display = 'none';
+  console.log('[Tarmed] auth-screen element:', el);
+  if (el) {
+    el.style.display = 'flex';
+    el.classList.add('visible');
+  }
+  const wrap = document.getElementById('main-wrap');
+  if (wrap) wrap.style.display = 'none';
 }
 function hideLoading() {
+  console.log('[Tarmed] hideLoading llamado');
   const el = document.getElementById('app-loading');
   if (el) el.style.display = 'none';
 }
@@ -1250,13 +1262,18 @@ async function supaImportFromJSON(ev) {
 }
 
 // ── Inicialización con verificación de sesión ────────────────
+let appInitialized = false;
 async function initApp() {
+  if (appInitialized) return;
+  appInitialized = true;
+  console.log('[Tarmed] initApp iniciando...');
   // Esperar a que el SDK de Supabase esté disponible (máx 5s)
   let attempts = 0;
   while (typeof window.supabase === 'undefined' && attempts < 50) {
     await new Promise(r => setTimeout(r, 100));
     attempts++;
   }
+  console.log('[Tarmed] SDK disponible:', typeof window.supabase !== 'undefined', 'intentos:', attempts);
   if (typeof window.supabase === 'undefined') {
     setLoadingMsg('No se pudo cargar el SDK de Supabase. Verificá tu conexión a internet y recargá la página.');
     return;
@@ -1265,13 +1282,17 @@ async function initApp() {
     setLoadingMsg('Error al inicializar Supabase. Recargá la página.');
     return;
   }
+  console.log('[Tarmed] Supabase inicializado, verificando sesión...');
   setLoadingMsg('Verificando sesión...');
   try {
     const { data: { session }, error } = await supaClient.auth.getSession();
+    console.log('[Tarmed] getSession resultado — session:', !!session, 'error:', error);
     if (error) throw error;
     if (session) {
+      console.log('[Tarmed] Sesión activa, cargando datos...');
       await onAuthSuccess(session.user);
     } else {
+      console.log('[Tarmed] Sin sesión, mostrando login...');
       hideLoading();
       showAuthScreen();
     }
@@ -1279,11 +1300,13 @@ async function initApp() {
     console.error('[Tarmed] Error en initApp:', e);
     setLoadingMsg('Error de conexión: ' + (e.message || e) + '. Verificá tu internet y recargá.');
   }
-  // Escuchar cambios de sesión
+  // Escuchar cambios de sesión (después del login/logout manual)
   supaClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    console.log('[Tarmed] onAuthStateChange:', event);
+    if (event === 'SIGNED_IN' && session && !supaCurrentUser) {
       await onAuthSuccess(session.user);
     } else if (event === 'SIGNED_OUT') {
+      supaCurrentUser = null;
       hideLoading();
       showAuthScreen();
     }
@@ -4480,10 +4503,17 @@ document.addEventListener('keydown',e=>{
   }
 });
 // ══ INIT ══════════════════════════════════════════════════
-const todayDate=new Date();
-document.getElementById('ret-fecha').value=todayDate.toISOString().slice(0,10);
-const selMes=document.getElementById('ped-mes');MESES.forEach((m,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=m;if(i===todayDate.getMonth())o.selected=true;selMes.appendChild(o);});
 document.addEventListener('DOMContentLoaded', function() {
+  const todayDate = new Date();
+  const retFecha = document.getElementById('ret-fecha');
+  if (retFecha) retFecha.value = todayDate.toISOString().slice(0, 10);
+  const selMes = document.getElementById('ped-mes');
+  if (selMes) MESES.forEach((m, i) => {
+    const o = document.createElement('option');
+    o.value = i + 1; o.textContent = m;
+    if (i === todayDate.getMonth()) o.selected = true;
+    selMes.appendChild(o);
+  });
   initApp();
 });
 
@@ -4775,6 +4805,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
