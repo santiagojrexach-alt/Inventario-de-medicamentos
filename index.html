@@ -453,8 +453,9 @@ button:hover{background:var(--ps)}
   <div class="app-title-wrap">
     <span class="app-title" id="app-title-label">Inventario Tarmed</span>
     <span class="app-subtitle" id="app-subtitle-label" style="display:none"></span>
+  <span id="tarmed-chip-topbar" style="font-size:10px;color:var(--tm);display:none"></span>
   </div>
-  <div id="tarmed-chip-wrap" style="margin-left:4px"></div>
+  <div id="tarmed-chip-wrap" style="display:none"></div>
   <div id="sync-indicator"></div>
   <div id="save-ind" style="display:none;align-items:center;gap:4px" title="Estado de guardado">
     <div id="save-dot" class="save-dot"></div>
@@ -1035,6 +1036,8 @@ button:hover{background:var(--ps)}
 
 
 
+
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1096,7 +1099,7 @@ function buildAuthBoxHTML() {
       <button id="tab-login" onclick="authSwitchTab('login')"
         style="flex:1;padding:8px;border:none;background:#fff;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;color:#1A2E18">Ingresar</button>
       <button id="tab-register" onclick="authSwitchTab('register')"
-        style="flex:1;padding:8px;border:none;background:none;border-radius:4px;font-size:13px;cursor:pointer;color:#5A7855">Registrarse</button>
+        style="flex:1;padding:8px;border:none;background:none;border-radius:4px;font-size:13px;cursor:pointer;color:#5A7855;display:none">Registrarse</button>
     </div>
     <div id="auth-login">
       <div style="margin-bottom:12px">
@@ -1185,7 +1188,17 @@ async function authLogin() {
   setAuthMsg('');
   const { data, error } = await supaClient.auth.signInWithPassword({ email, password: pass });
   setAuthLoading(false);
-  if (error) { setAuthMsg(error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos.' : error.message); return; }
+  if (error) {
+    const msgs = {
+      'Invalid login credentials':        'Email o contraseña incorrectos.',
+      'Email not confirmed':              'Confirmá tu email antes de ingresar.',
+      'Too many requests':                'Demasiados intentos. Esperá unos minutos.',
+      'email rate limit exceeded':        'Límite de emails alcanzado. Esperá unos minutos.',
+      'Failed to fetch':                  'Error de conexión. Verificá tu internet.',
+    };
+    setAuthMsg(msgs[error.message] || error.message);
+    return;
+  }
   await onAuthSuccess(data.user);
 }
 
@@ -1200,7 +1213,17 @@ async function authRegister() {
   setAuthMsg('');
   const { data, error } = await supaClient.auth.signUp({ email, password: pass });
   setAuthLoading(false);
-  if (error) { setAuthMsg(error.message); return; }
+  if (error) {
+    const msgs = {
+      'User already registered':          'Ya existe una cuenta con ese email.',
+      'Signups not allowed for this instance': 'El registro está deshabilitado. Contactá al administrador.',
+      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
+      'email rate limit exceeded':        'Límite alcanzado. Esperá unos minutos.',
+      'Failed to fetch':                  'Error de conexión. Verificá tu internet.',
+    };
+    setAuthMsg(msgs[error.message] || error.message);
+    return;
+  }
   if (data.user && !data.session) {
     setAuthMsg('¡Cuenta creada! Revisá tu email para confirmar la cuenta.', false);
     return;
@@ -1212,7 +1235,17 @@ async function authForgotPassword() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) { setAuthMsg('Ingresá tu email arriba primero.'); return; }
   const { error } = await supaClient.auth.resetPasswordForEmail(email);
-  if (error) { setAuthMsg(error.message); return; }
+  if (error) {
+    const msgs = {
+      'User already registered':          'Ya existe una cuenta con ese email.',
+      'Signups not allowed for this instance': 'El registro está deshabilitado. Contactá al administrador.',
+      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
+      'email rate limit exceeded':        'Límite alcanzado. Esperá unos minutos.',
+      'Failed to fetch':                  'Error de conexión. Verificá tu internet.',
+    };
+    setAuthMsg(msgs[error.message] || error.message);
+    return;
+  }
   setAuthMsg('Email de recuperación enviado. Revisá tu casilla.', false);
 }
 
@@ -1900,8 +1933,12 @@ function renderTarmedChip() {
   const label = daysLeft === 0 ? 'Tarmed HOY'
     : daysLeft <= ahead ? `Tarmed ${daysLeft}d (${fmt})`
     : `Tarmed: ${fmt}`;
-  document.getElementById('tarmed-chip-wrap').innerHTML =
-    `<button class="tc ${cls}" onclick="sTab('config')">${label}</button>`;
+  // Chip en topbar (oculto pero mantenido por compatibilidad)
+  const chipWrap = document.getElementById('tarmed-chip-wrap');
+  if (chipWrap) chipWrap.innerHTML = `<button class="tc ${cls}" onclick="sTab('config')">${label}</button>`;
+  // Mostrar como subtítulo bajo el título
+  const chipTop = document.getElementById('tarmed-chip-topbar');
+  if (chipTop) { chipTop.textContent = label; chipTop.style.display = 'inline'; chipTop.style.color = daysLeft === 0 ? 'var(--rt)' : daysLeft <= ahead ? '#C88A18' : 'var(--tm)'; }
 }
 function renderReminder() {
   const { daysLeft, pickDate, ahead } = computeReminder();
@@ -2102,8 +2139,8 @@ function buildSearchResults(q) {
     const key = pacMatch ? (r.paciente||'') : r.name;
     if (!dispHits.has(key)) {
       const label = pacMatch
-        ? `${r.paciente} — ${r.name} ${r.dose}mg · ${r.fecha}`
-        : `${r.name} ${r.dose}mg — ${r.qty} caja${r.qty!==1?'s':''} · ${r.fecha}${r.paciente?' → '+r.paciente:''}`;
+        ? `${r.paciente} — ${r.name} ${r.dose}mg · ${fmtFecha(r.fecha)}`
+        : `${r.name} ${r.dose}mg — ${r.qty} caja${r.qty!==1?'s':''} · ${fmtFecha(r.fecha)}${r.paciente?' → '+r.paciente:''}`;
       dispHits.set(key, { type:'Dispensación', icon:'💉',
         label, action:()=>{ sTab('dispensacion'); }
       });
@@ -2171,20 +2208,22 @@ document.addEventListener('click',e=>{
 // ══ RENDER: RESUMEN — helpers de template ════════════════
 
 function buildRecentActionsHTML() {
-  // Últimas 5 acciones: dispensaciones + ajustes de pedido recientes
+  // Últimas 5 dispensaciones de los últimos 7 días
   if (!retiros.length) return '';
-  const recent = retiros.slice(0, 3);
+  const hace7 = new Date(Date.now() - 7*864e5).toISOString().slice(0,10);
+  const recent = retiros.filter(r => r.fecha >= hace7 && r.paciente !== '[ajuste manual]' && r.paciente !== '[entrada manual]').slice(0, 5);
+  if (!recent.length) return '';
   const rows = recent.map(r => {
-    const rel = relativeDate(r.fecha);
+    const rel   = relativeDate(r.fecha);
     const extra = r.paciente ? ` → ${r.paciente}` : '';
-    return `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--t2)">
+    return `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--t2);border-bottom:1px solid var(--bdl)">
       <span>💉 ${r.name} ${r.dose}mg${extra}</span>
       <span style="color:var(--tm);white-space:nowrap;margin-left:8px">${rel}</span>
     </div>`;
   }).join('');
   return `<div class="card" style="margin-bottom:.45rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div class="sec" style="margin:0">⏱ Acciones recientes</div>
+      <div class="sec" style="margin:0">⏱ Últimas dispensaciones</div>
       <span style="font-size:10px;color:var(--ac);cursor:pointer" onclick="sTab('dispensacion')">Ver todas →</span>
     </div>
     ${rows}
@@ -2220,6 +2259,12 @@ function buildMetricsGridHTML(crits, lows, venAlert, dispMes, dispHoy) {
     </div>`;
 }
 
+// Formatear fecha ISO (YYYY-MM-DD) a DD/MM/YYYY
+function fmtFecha(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
 function buildTodayDispHTML() {
   const hoy    = new Date().toISOString().slice(0, 10);
   const todayR = retiros.filter(r => r.fecha === hoy)
@@ -2398,7 +2443,14 @@ function updateTabAlerts(crits, lows) {
     ? `${crits} sin stock`
     : `${lows} con stock bajo`;
 }
-function togAlert(hdr){const body=hdr.nextElementSibling;body.classList.toggle('open');const spans=hdr.querySelectorAll('span');const arw=spans[spans.length-1];if(arw)arw.style.transform=body.classList.contains('open')?'rotate(0deg)':'rotate(-90deg)';}
+function togAlert(hdr) {
+  const body = hdr.nextElementSibling;
+  const isOpen = body.style.display !== 'none' && body.style.display !== '';
+  body.style.display = isOpen ? 'none' : 'block';
+  const spans = hdr.querySelectorAll('span');
+  const arw = spans[spans.length - 1];
+  if (arw) arw.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
 
 // INVENTORY — fixed index bug, clean two-level view
 
@@ -2413,7 +2465,7 @@ function updateLastEventBar() {
   const when = mins < 2   ? 'hace un momento'
              : mins < 60  ? `hace ${mins} min`
              : mins < 1440 ? `hace ${Math.round(mins/60)}h`
-             : `el ${last.fecha}`;
+             : `el ${fmtFecha(last.fecha)}`;
   bar.style.display = 'block';
   bar.innerHTML = `💊 Última dispensación: <strong>${last.name} ${last.dose}mg × ${last.qty}</strong>${last.paciente?' — '+last.paciente:''} · <span style="color:var(--ac)">${when}</span>`;
 }
@@ -3393,7 +3445,7 @@ function checkVencidoWarning() {
 function printRetiros(){
   const d=new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const hdr=cfg.name?`<p style="color:#555;font-size:12px">${cfg.name}</p>`:'';
-  const rows=retiros.map(r=>`<tr><td style="padding:5px 10px;border-bottom:1px solid #ddd">${r.fecha}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:600">${r.name} ${r.dose}mg</td><td style="padding:5px 10px;border-bottom:1px solid #ddd">${r.lab||'—'}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center">${r.qty}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd">${r.paciente||'—'}</td></tr>`).join('');
+  const rows=retiros.map(r=>`<tr><td style="padding:5px 10px;border-bottom:1px solid #ddd">${fmtFecha(r.fecha)}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:600">${r.name} ${r.dose}mg</td><td style="padding:5px 10px;border-bottom:1px solid #ddd">${r.lab||'—'}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center">${r.qty}</td><td style="padding:5px 10px;border-bottom:1px solid #ddd">${r.paciente||'—'}</td></tr>`).join('');
   const win=window.open('','_blank');
   win.document.write(`<!DOCTYPE html><html><head><title>Historial dispensaciones</title><style>body{font-family:Arial;padding:32px;font-size:13px}h2{color:#18302A;margin-bottom:4px}table{width:100%;border-collapse:collapse}th{background:#18302A;color:#fff;padding:7px 10px;text-align:left;font-size:12px}@media print{body{padding:16px}}</style></head><body><h2>Historial de Dispensaciones — Tarmed</h2>${hdr}<p style="color:#555;font-size:12px;margin-bottom:16px">${d} · ${retiros.length} dispensaciones</p><table><tr><th>Fecha</th><th>Medicamento</th><th>Laboratorio</th><th>Cajas</th><th>Paciente</th></tr>${rows}</table></body></html>`);
   win.document.close();win.print();
@@ -4852,7 +4904,7 @@ function renderRetiros(resetPage=true) {
         <div style="flex:1">
           <span style="font-size:13px;font-weight:600">${r.name} ${r.dose}mg</span>
           ${r.lab?`<span class="badge b-gray" style="margin-left:4px;font-size:9px">${r.lab}</span>`:''}
-          <div style="font-size:11px;color:var(--tm)">${r.fecha} <span style="color:var(--ac);font-size:10px">${relativeDate(r.fecha)}</span>${extra?' · '+extra:''} · ${r.qty} caja${r.qty!==1?'s':''}${r.nota?' · <em>'+r.nota+'</em>':''}</div>
+          <div style="font-size:11px;color:var(--tm)">${fmtFecha(r.fecha)} <span style="color:var(--ac);font-size:10px">${relativeDate(r.fecha)}</span>${extra?' · '+extra:''} · ${r.qty} caja${r.qty!==1?'s':''}${r.nota?' · <em>'+r.nota+'</em>':''}</div>
         </div>
         <span class="badge ${badge}" style="font-size:9px">${r.group}</span>
         <button class="delbtn no-print" onclick="delRetiro(${realIdx})">×</button>
@@ -4871,6 +4923,8 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
+
 
 
 
