@@ -229,7 +229,7 @@ button:hover{background:var(--ps)}
 .disp-ac-item{padding:8px 11px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:7px}
 .disp-ac-item:last-child{border-bottom:none}
 .disp-ac-item:hover,.disp-ac-item.focused{background:var(--acl);color:var(--ac)}
-.mbd{display:none;position:fixed;inset:0;background:rgba(5,20,10,.4);z-index:100;overflow-y:auto}
+.mbd{display:none;position:fixed;inset:0;background:rgba(5,20,10,.4);z-index:10000;overflow-y:auto}
 .confirm-modal{max-width:360px;margin:30vh auto;padding:24px;background:var(--pc);border-radius:var(--rmd);box-shadow:0 8px 32px rgba(0,0,0,.2)}
 .confirm-modal h3{font-size:15px;font-weight:700;margin-bottom:8px}
 .confirm-modal p{font-size:13px;color:var(--tm);margin-bottom:20px;line-height:1.5}
@@ -914,7 +914,7 @@ button:hover{background:var(--ps)}
     </div>
     <div style="font-size:11px;color:var(--tm)">Útil en guardia nocturna o pantallas pequeñas.</div>
   </div>
-  <div class="card">
+  <div class="card" style="display:none" id="shortcuts-card">
     <div class="sec">Atajos de teclado</div>
     <div style="font-size:11px;color:var(--tm);margin-bottom:8px">Disponibles en cualquier momento (salvo que el foco esté en un campo de texto).</div>
     <table style="width:100%;border-collapse:collapse;font-size:12px" id="shortcuts-table">
@@ -1024,6 +1024,7 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
 
 
 
@@ -1156,8 +1157,13 @@ function setLoadingMsg(msg) {
 }
 function hideAuthScreen() {
   const el = document.getElementById('auth-screen');
-  if (el) el.style.display = 'none';
-  document.getElementById('main-wrap').style.display = '';
+  if (el) {
+    el.style.display = 'none';
+    el.style.pointerEvents = 'none'; // nunca bloquear clicks aunque esté visible
+    el.style.zIndex = '-1';
+  }
+  const wrap = document.getElementById('main-wrap');
+  if (wrap) wrap.style.display = '';
   hideLoading();
 }
 function authSwitchTab(tab) {
@@ -2013,6 +2019,10 @@ function renderCyclePedido() {
 function saveConfig(){cfg.themeIdx=themeIdx;saveState();renderConfigPreview();}
 
 function renderShortcutsTable() {
+  // Solo mostrar en desktop (no táctil)
+  const card = document.getElementById('shortcuts-card');
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (card) card.style.display = isTouchDevice ? 'none' : '';
   const tbody = document.getElementById('shortcuts-tbody');
   if (!tbody) return;
   const shortcuts = [
@@ -2514,7 +2524,7 @@ function buildLotChipHTML(l, realIdx, li) {
       <span class="lsub-dot" style="background:${dotColor}"></span>
       <strong>${l.dose}mg</strong>${l.lab ? ` · ${l.lab}` : ''}
       · <button onclick="adjStock(${realIdx},${li},-1)" style="border:none;background:none;cursor:pointer;color:var(--tm);font-size:11px;padding:0 2px;line-height:1" title="Restar 1 caja">−</button><span style="font-weight:700;min-width:12px;display:inline-block;text-align:center">${l.qty}</span><button onclick="adjStock(${realIdx},${li},1)" style="border:none;background:none;cursor:pointer;color:var(--tm);font-size:11px;padding:0 2px;line-height:1" title="Sumar 1 caja">+</button>${venLabel}
-      <button onclick="openQD(${realIdx},${li})" class="inv-disp-btn" style="border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600;margin-left:4px;white-space:nowrap" title="Registrar dispensación de este lote">💉 Dispensar</button>
+      <button onclick="openQD(${realIdx},${li})" class="inv-disp-btn" style="border:none;background:var(--acl);color:var(--ac);cursor:pointer;font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600;margin-left:4px;white-space:nowrap" title="Registrar dispensación a paciente">💉 Dispensar</button>
     </span>`;
 }
 
@@ -2532,10 +2542,7 @@ function buildQuickRowHTML(m, realIdx) {
         <div class="inv-quick-sub">${doses}mg · ${m.lots.length} lote${m.lots.length!==1?'s':''}</div>
       </div>
       <span class="sp ${stockClass(tot, totMin)}" style="font-size:14px;font-weight:700">${tot}</span>
-      <div style="display:flex;gap:4px">
-        <button onclick="quickDispense(${realIdx})" class="btn-quick-1caja" title="Dispensar 1 caja ahora">1 caja</button>
-        <button onclick="openQD(${realIdx},0)" class="btn-quick-disp" title="Dispensar con detalle">💉</button>
-      </div>
+      <button onclick="openQD(${realIdx},0)" class="btn-quick-disp" title="Registrar dispensación" style="padding:6px 14px;font-size:12px">💉 Dispensar</button>
     </div>`;
 }
 function quickDispense(mi) {
@@ -4937,6 +4944,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
