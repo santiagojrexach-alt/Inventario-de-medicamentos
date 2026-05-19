@@ -1143,6 +1143,10 @@ function buildAuthBoxHTML() {
     </label>
   `;
 }
+function hideLoading() {
+  const el = document.getElementById('app-loading');
+  if (el) el.style.display = 'none';
+}
 function setLoadingMsg(msg) {
   const el = document.getElementById('loading-msg');
   if (el) el.textContent = msg;
