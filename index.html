@@ -28,7 +28,9 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .wrap{padding:.55rem;max-width:960px;margin:0 auto}
 .large-text{font-size:15px!important}
 .large-text .tab{font-size:13px!important}
-.large-text .mc,.large-text .mcl,.large-text .mcv{font-size:inherit}
+.xlarge-text{font-size:17px!important}
+.xlarge-text .tab{font-size:14px!important}
+.xlarge-text .mcv{font-size:28px!important}
 /* TOPBAR */
 .back-btn{display:none;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--tm);font-size:12px;padding:4px 8px;border-radius:var(--rsm);flex-shrink:0}
 .back-btn:hover{background:var(--ps);color:var(--t1)}
@@ -899,12 +901,18 @@ button:hover{background:var(--ps)}
   <div class="card"><div class="sec">Vista previa del recordatorio</div><div id="cfg-preview"></div></div>
   <div class="card">
     <div class="sec">Accesibilidad</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <label style="font-size:13px">Texto más grande</label>
-      <input type="checkbox" id="cfg-large-text" style="width:auto;accent-color:var(--ac)"
-             onchange="toggleLargeText(this.checked)">
+    <div style="margin-bottom:8px">
+      <label style="font-size:12px;font-weight:600;color:var(--t2);display:block;margin-bottom:8px">Tamaño de texto</label>
+      <div style="display:flex;gap:6px">
+        <button id="font-btn-normal" onclick="setFontSize('normal')"
+          style="flex:1;padding:7px;border:1px solid var(--bdl);border-radius:var(--rsm);background:var(--ac);color:#fff;font-size:12px;cursor:pointer;font-weight:600">Normal</button>
+        <button id="font-btn-large" onclick="setFontSize('large')"
+          style="flex:1;padding:7px;border:1px solid var(--bdl);border-radius:var(--rsm);background:var(--ps);color:var(--t2);font-size:12px;cursor:pointer">Grande</button>
+        <button id="font-btn-xlarge" onclick="setFontSize('xlarge')"
+          style="flex:1;padding:7px;border:1px solid var(--bdl);border-radius:var(--rsm);background:var(--ps);color:var(--t2);font-size:12px;cursor:pointer">Muy grande</button>
+      </div>
     </div>
-    <div style="font-size:11px;color:var(--tm)">Aumenta el tamaño de fuente en toda la app.</div>
+    <div style="font-size:11px;color:var(--tm)">Útil en guardia nocturna o pantallas pequeñas.</div>
   </div>
   <div class="card">
     <div class="sec">Atajos de teclado</div>
@@ -921,35 +929,25 @@ button:hover{background:var(--ps)}
     <div class="sec">Herramientas</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div>
-        <div style="font-size:12px;font-weight:600;margin-bottom:3px">🔗 Compartir</div>
-        <p style="font-size:11px;color:var(--tm);margin-bottom:8px;line-height:1.5">Genera una versión de la app con un inventario demo (un medicamento por grupo) y sin ningún dato personal. Cada compañero lleva su propio registro independiente.</p>
-        <button class="btnacc" onclick="exportClean()">Generar versión para compartir</button>
-      </div>
-      <div style="border-top:1px solid var(--bdl);padding-top:10px">
         <div style="font-size:12px;font-weight:600;margin-bottom:3px">📖 Tutorial interactivo</div>
-        <p style="font-size:11px;color:var(--tm);margin-bottom:8px;line-height:1.5">Recorrido guiado por todas las pestañas de la app. Útil para familiarizarse con las funcionalidades.</p>
+        <p style="font-size:11px;color:var(--tm);margin-bottom:8px;line-height:1.5">Recorrido guiado por todas las pestañas de la app.</p>
         <button class="tbtn" onclick="localStorage.removeItem('tarmed_tut_done');startTutorial()">Ver tutorial</button>
-            <button class="tbtn" onclick="showOnboarding()" style="background:var(--ps);color:var(--tm);border:1px solid var(--bdl)" title="Ver el onboarding sin perder datos">Ver onboarding</button>
       </div>
       <div style="border-top:1px solid var(--bdl);padding-top:10px">
-        <div style="font-size:12px;font-weight:600;margin-bottom:3px">📤 Exportación</div>
-        <p style="font-size:11px;color:var(--tm);margin-bottom:0;line-height:1.5"><strong>JSON</strong> — copia de seguridad completa para migrar a versiones futuras.<br><strong>CSV</strong> — inventario en Excel.<br><strong>🖨 Imprimir</strong> — resumen para papel.</p>
+        <div style="font-size:12px;font-weight:600;margin-bottom:3px">📤 Backup y exportación</div>
+        <p style="font-size:11px;color:var(--tm);margin-bottom:0;line-height:1.5"><strong>JSON</strong> — copia de seguridad completa.<br><strong>CSV</strong> — inventario en Excel.<br>🖨 <strong>Imprimir</strong> — resumen para papel.</p>
       </div>
       <div style="border-top:1px solid var(--bdl);padding-top:10px">
-        <div style="font-size:12px;font-weight:600;margin-bottom:3px">🗑 Datos locales</div>
-        <p style="font-size:11px;color:var(--tm);margin-bottom:8px;line-height:1.5">Borra todos los datos del browser y restaura el inventario de ejemplo.</p>
-        <button class="btnred" onclick="clearStorage()">Borrar y restaurar defaults</button>
-            <hr style="border:none;border-top:1px solid var(--bd);margin:8px 0">
-            <div style="font-size:12px;color:var(--tm);margin-bottom:6px" id="auth-user-email"></div>
-            <button class="tbtn" onclick="authLogout()" style="background:var(--ps);color:var(--t2)">Cerrar sesión</button>
+        <div style="font-size:12px;color:var(--tm);margin-bottom:6px" id="auth-user-email"></div>
+        <button class="tbtn" onclick="authLogout()" style="background:var(--ps);color:var(--t2)">Cerrar sesión</button>
+      </div>
+    </div>
   </div>
-  </div>
-</div>
 <div class="card" id="cfg-multiusuario-card">
   <div style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none" onclick="toggleMultiusuario()">
     <div style="flex:1">
       <div class="sec" style="margin:0">Uso multiusuario</div>
-      <div style="font-size:11px;color:var(--tm);margin-top:2px">Residentes y registro de quién dispensó</div>
+      <div style="font-size:11px;color:var(--tm);margin-top:2px">Para uso en equipo: guardia, residencia. Registra quién dispensó cada medicamento.</div>
     </div>
     <label style="display:flex;align-items:center;gap:6px;cursor:pointer" onclick="event.stopPropagation()">
       <span style="font-size:11px;color:var(--tm)">Activo</span>
@@ -1026,6 +1024,8 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
+
 
 
 
@@ -1725,14 +1725,28 @@ function clearStorage(){
 }
 function applyDark(){document.body.classList.toggle('dark',darkMode);document.getElementById('dark-btn').classList.toggle('on',darkMode);}
 function togDark(){darkMode=!darkMode;STORE.darkMode=darkMode;applyDark();saveState();}
-function toggleLargeText(on) {
-  document.body.classList.toggle('large-text', on);
-  cfg.largeText = on; saveState();
+function setFontSize(size) {
+  document.body.classList.remove('large-text', 'xlarge-text');
+  if (size === 'large')  document.body.classList.add('large-text');
+  if (size === 'xlarge') document.body.classList.add('xlarge-text');
+  cfg.fontSize = size;
+  saveState();
+  // Actualizar botones
+  ['normal','large','xlarge'].forEach(s => {
+    const btn = document.getElementById('font-btn-' + s);
+    if (!btn) return;
+    const active = s === size;
+    btn.style.background = active ? 'var(--ac)' : 'var(--ps)';
+    btn.style.color = active ? '#fff' : 'var(--t2)';
+    btn.style.fontWeight = active ? '600' : '400';
+  });
 }
+function toggleLargeText(on) { setFontSize(on ? 'large' : 'normal'); } // legacy
 function syncConfigUI() {
   if(!cfg) return;
-  const ltChk = document.getElementById('cfg-large-text');
-  if (ltChk) { ltChk.checked = !!cfg.largeText; document.body.classList.toggle('large-text', !!cfg.largeText); }
+  // Restaurar nivel de fuente
+  if (cfg.fontSize) setFontSize(cfg.fontSize);
+  else if (cfg.largeText) setFontSize('large'); // migración legacy
   document.getElementById('cfg-day').value       = cfg.day;
   document.getElementById('cfg-ahead').value     = cfg.ahead;
   document.getElementById('cfg-name').value      = cfg.name || '';
@@ -4923,6 +4937,8 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
+
 
 
 
