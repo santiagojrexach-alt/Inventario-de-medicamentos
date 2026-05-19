@@ -1068,8 +1068,14 @@ function setSyncStatus(status, msg) {
 function showAuthScreen() {
   console.log('[Tarmed] showAuthScreen llamado');
   const el = document.getElementById('auth-screen');
+  console.log('[Tarmed] auth-screen encontrado:', el !== null, el);
   if (el) {
-    el.setAttribute('style', 'display:flex!important;position:fixed;inset:0;background:#EEF5EE;z-index:600;align-items:center;justify-content:center;padding:20px');
+    el.setAttribute('style', 'display:flex!important;position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF5EE;z-index:600;align-items:center;justify-content:center;padding:20px;overflow-y:auto');
+    console.log('[Tarmed] auth-screen style aplicado:', el.style.display);
+  } else {
+    console.error('[Tarmed] ERROR: auth-screen NO encontrado en el DOM');
+    // Fallback: crear el elemento si no existe
+    document.body.insertAdjacentHTML('beforeend', '<div id="auth-screen-fallback" style="display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF5EE;z-index:9999;align-items:center;justify-content:center"><div style="background:white;padding:32px;border-radius:14px;max-width:400px;width:90vw;text-align:center"><h2>Error de carga</h2><p style="margin:16px 0;color:#666">No se pudo cargar la pantalla de login.<br>Por favor recargá la página.</p><button onclick="location.reload()" style="background:#2E7A44;color:white;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px">Recargar</button></div></div>');
   }
   const wrap = document.getElementById('main-wrap');
   if (wrap) wrap.style.display = 'none';
