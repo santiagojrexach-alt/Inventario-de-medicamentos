@@ -1027,6 +1027,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -3185,12 +3186,24 @@ function renderPedidoList(){updateTbarSummary();
 
 function addLine(name, dose) {
   if (getPedTotal() >= TARMED_MAX_TOTAL) {
-    showToast(`⚠ Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return; return;
+    showToast(`⚠ Límite de ${TARMED_MAX_TOTAL} cajas alcanzado.`); return;
   }
-  const m         = inventory.find(x => x.name === name);
-  const usedLabs  = pedidoLines.filter(l => l.name === name && l.dose === dose).map(l => l.lab);
+  const m = inventory.find(x => x.name === name);
+  // Buscar lab sugerido que no esté ya en el pedido
+  const usedLabs = pedidoLines.filter(l => l.name === name && l.dose === dose).map(l => l.lab);
   const suggestLab = m?.lots.filter(l => l.dose === dose && l.lab && !usedLabs.includes(l.lab))[0]?.lab || '';
-  pedidoLines.push({ lineId: newLineId(), name, dose, lab: suggestLab, qty: 0 });
+  // Si ya existe línea con mismo medicamento+dosis+lab, no crear duplicado
+  const existing = pedidoLines.find(l => l.name === name && l.dose === dose && l.lab === suggestLab && suggestLab !== '');
+  if (existing) {
+    // Verificar límites antes de sumar
+    const labTot = getLabTotal(suggestLab);
+    if (labTot >= TARMED_MAX_PER_LAB) {
+      showToast(`⚠ Máximo ${TARMED_MAX_PER_LAB} cajas por laboratorio (${suggestLab}).`); return;
+    }
+    existing.qty += 1;
+  } else {
+    pedidoLines.push({ lineId: newLineId(), name, dose, lab: suggestLab, qty: 0 });
+  }
   saveState(); renderPedidoList(); updateTarmedBar(); renderPedConf();
 }
 function removeLine(lineId){pedidoLines=pedidoLines.filter(l=>l.lineId!==lineId);saveState();renderPedidoList();updateTarmedBar();renderPedConf();updatePedidoBadge();}
@@ -3303,11 +3316,24 @@ function buildMedDoseList() {
 function autoSel() {
   pedidoLines = []; lineCounter = 0;
   const medDoses = buildMedDoseList().sort((a, b) => b.deficit - a.deficit);
+  // Agrupar por medicamento+dosis+lab para evitar duplicados
+  const seen = {};
+  const grouped = [];
+  for (const md of medDoses) {
+    const key = `${md.name}|${md.dose}|${md.lab}`;
+    if (!seen[key]) {
+      seen[key] = true;
+      grouped.push({...md});
+    } else {
+      const ex = grouped.find(g => `${g.name}|${g.dose}|${g.lab}` === key);
+      if (ex) ex.deficit = (ex.deficit || 0) + (md.deficit || 0);
+    }
+  }
   const lc = {};
   let tot = 0;
-  for (const md of medDoses) {
+  for (const md of grouped) {
     if (tot >= TARMED_MAX_TOTAL) break;
-    const lv  = lc[md.lab] || 0;
+    const lv = lc[md.lab] || 0;
     if (md.lab && lv >= TARMED_MAX_PER_LAB) continue;
     const add = Math.min(
       md.deficit || 1,
@@ -5073,6 +5099,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
