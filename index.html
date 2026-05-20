@@ -1032,6 +1032,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1107,10 +1108,25 @@ function buildAuthBoxHTML() {
           style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;box-sizing:border-box;background:#fff;color:#1A2E18">
       </div>
       <div style="text-align:right;margin-bottom:14px">
-        <span onclick="authForgotPassword()" style="font-size:11px;color:#2E7A44;cursor:pointer">¿Olvidaste tu contraseña?</span>
+        <span onclick="authSwitchTab('forgot')" style="font-size:11px;color:#2E7A44;cursor:pointer">¿Olvidaste tu contraseña?</span>
       </div>
       <button id="login-btn" onclick="authLogin()"
         style="width:100%;padding:12px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer">Ingresar</button>
+    </div>
+    <div id="auth-forgot" style="display:none">
+      <div style="font-size:13px;color:#3A5435;margin-bottom:16px;line-height:1.5">
+        Ingresá tu email y te mandamos un link para crear una nueva contraseña.
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px">Email</div>
+        <input type="email" id="forgot-email" placeholder="tu@email.com" autocomplete="email"
+          style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;box-sizing:border-box;background:#fff;color:#1A2E18">
+      </div>
+      <button id="forgot-btn" onclick="authForgotPassword()"
+        style="width:100%;padding:12px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer">Enviar link de recuperación</button>
+      <div style="text-align:center;margin-top:12px">
+        <span onclick="authSwitchTab('login')" style="font-size:12px;color:#2E7A44;cursor:pointer">← Volver al inicio de sesión</span>
+      </div>
     </div>
     <div id="auth-register" style="display:none">
       <div style="margin-bottom:12px">
@@ -1160,10 +1176,18 @@ function hideAuthScreen() {
   hideLoading();
 }
 function authSwitchTab(tab) {
-  document.getElementById('auth-login').style.display    = tab === 'login'    ? '' : 'none';
-  document.getElementById('auth-register').style.display = tab === 'register' ? '' : 'none';
+  const sections = ['auth-login', 'auth-register', 'auth-forgot'];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const active = document.getElementById('auth-' + tab);
+  if (active) active.style.display = '';
+  // Actualizar tabs visuales (solo login y register tienen botón)
   const btnLogin = document.getElementById('tab-login');
   const btnReg   = document.getElementById('tab-register');
+  const tabsWrap = btnLogin?.parentElement;
+  if (tabsWrap) tabsWrap.style.display = tab === 'forgot' ? 'none' : 'flex';
   if (btnLogin) {
     btnLogin.style.background  = tab === 'login' ? '#fff' : 'none';
     btnLogin.style.fontWeight  = tab === 'login' ? '700' : '400';
@@ -1255,8 +1279,11 @@ async function authRegister() {
 }
 
 async function authForgotPassword() {
-  const email = document.getElementById('login-email').value.trim();
-  if (!email) { setAuthMsg('Ingresá tu email arriba primero.'); return; }
+  const emailEl = document.getElementById('forgot-email') || document.getElementById('login-email');
+  const email = emailEl?.value.trim();
+  if (!email) { setAuthMsg('Ingresá tu email.'); return; }
+  const btn = document.getElementById('forgot-btn');
+  if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; }
   const { error } = await supaClient.auth.resetPasswordForEmail(email);
   if (error) {
     const msgs = {
@@ -1269,7 +1296,9 @@ async function authForgotPassword() {
     setAuthMsg(msgs[error.message] || error.message);
     return;
   }
-  setAuthMsg('Email de recuperación enviado. Revisá tu casilla.', false);
+  const btn2 = document.getElementById('forgot-btn');
+  if (btn2) { btn2.textContent = 'Enviar link de recuperación'; btn2.disabled = false; }
+  setAuthMsg('✓ Email enviado. Revisá tu casilla de correo.', false);
 }
 
 async function authLogout() {
@@ -5011,6 +5040,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
