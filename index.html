@@ -1439,8 +1439,34 @@ async function initApp() {
   if (hash && hash.includes('access_token')) {
     setLoadingMsg('Verificando cuenta...');
     history.replaceState(null, '', window.location.pathname);
-    // Esperar a que Supabase procese el token del hash
-    await new Promise(r => setTimeout(r, 1000));
+    // Extraer el token del hash y crear sesión
+    try {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken  = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      const type = params.get('type');
+      if (accessToken) {
+        await new Promise(r => setTimeout(r, 500));
+        // Inicializar Supabase primero
+        let attempts = 0;
+        while (typeof window.supabase === 'undefined' && attempts < 50) {
+          await new Promise(r => setTimeout(r, 100));
+          attempts++;
+        }
+        if (!initSupabase()) { setLoadingMsg('Error al conectar. Recargá la página.'); return; }
+        // Setear la sesión manualmente con el token recibido
+        const { data, error } = await supaClient.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || ''
+        });
+        if (!error && data?.user) {
+          await onAuthSuccess(data.user);
+          return;
+        }
+      }
+    } catch(e) {
+      console.error('[Tarmed] Error procesando token:', e);
+    }
   }
   // Esperar a que el SDK de Supabase esté disponible (máx 5s)
   let attempts = 0;
