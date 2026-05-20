@@ -571,7 +571,7 @@ button:hover{background:var(--ps)}
   <div id="pedido-ciclo" style="display:none"></div>
   <div class="ped-sticky" id="ped-sticky">
     <span style="font-size:13px;font-weight:700;white-space:nowrap">🛒 <span id="ped-sticky-count">0</span>/10</span>
-    <div id="ped-sticky-labs" style="display:flex;gap:4px;flex-wrap:nowrap;flex:1;font-size:10px;color:var(--tm);overflow-x:auto;scrollbar-width:none"></div>
+    <div id="ped-sticky-labs" style="display:flex;gap:3px;flex-wrap:wrap;flex:1;font-size:9px;color:var(--tm);align-content:flex-start;max-height:36px;overflow:hidden"></div>
     <button class="tbtn" onclick="clearPedido()" style="font-size:11px;padding:3px 8px">✕ Limpiar</button>
     <button class="tbtn" onclick="autoSel()" style="font-size:11px;padding:3px 8px">✦ Auto</button>
     <button class="tbtn" onclick="openRecepcion()" style="font-size:11px;padding:3px 8px" title="Registrar medicamentos recibidos de Tarmed">📥 Recibido</button>
@@ -3248,10 +3248,16 @@ function buildLabCountHTML() {
   pedidoLines.filter(l => l.qty > 0 && l.lab).forEach(l => {
     lc[l.lab] = (lc[l.lab] || 0) + l.qty;
   });
-  const html = Object.entries(lc).map(([lab, c]) =>
-    `<span style="background:var(--ps);border:1px solid var(--bdl);border-radius:99px;padding:1px 7px;font-size:10px">${lab}: ${c}/${TARMED_MAX_PER_LAB}</span>`
-  ).join('');
-  const warns = Object.entries(lc)
+  // Mostrar todos en una sola línea, chips más compactos
+  const entries = Object.entries(lc);
+  const html = entries.map(([lab, c]) => {
+    const pct = c / TARMED_MAX_PER_LAB;
+    const bg = pct >= 1 ? '#FDEBEB' : pct >= 0.67 ? '#FEF3D8' : 'var(--ps)';
+    const col = pct >= 1 ? '#891E1E' : pct >= 0.67 ? '#7A4808' : 'var(--tm)';
+    const labShort = lab.length > 8 ? lab.substring(0, 7) + '.' : lab;
+    return `<span style="background:${bg};border:1px solid ${col}30;border-radius:99px;padding:1px 6px;font-size:9px;color:${col};white-space:nowrap">${labShort} ${c}/${TARMED_MAX_PER_LAB}</span>`;
+  }).join('');
+  const warns = entries
     .filter(([, c]) => c > TARMED_MAX_PER_LAB)
     .map(([l]) => `<span class="sp slow" style="font-size:10px">⚠ ${l}: excede ${TARMED_MAX_PER_LAB}</span>`)
     .join('');
