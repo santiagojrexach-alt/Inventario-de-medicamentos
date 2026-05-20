@@ -955,6 +955,7 @@ button:hover{background:var(--ps)}
       </div>
       <div style="border-top:1px solid var(--bdl);padding-top:10px">
         <div style="font-size:12px;color:var(--tm);margin-bottom:6px" id="auth-user-email"></div>
+        <button class="tbtn" onclick="showChangePwdModal()" style="background:var(--ps);color:var(--t2);margin-bottom:6px">Cambiar contraseña</button>
         <button class="tbtn" onclick="authLogout()" style="background:var(--ps);color:var(--t2)">Cerrar sesión</button>
       </div>
     </div>
@@ -997,6 +998,7 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
 
 
 
@@ -1115,15 +1117,15 @@ function buildAuthBoxHTML() {
     </div>
     <div id="auth-forgot" style="display:none">
       <div style="font-size:13px;color:#3A5435;margin-bottom:16px;line-height:1.5">
-        Ingresá tu email y te mandamos un link para crear una nueva contraseña.
+        Ingresá tu email y te vamos a contactar para resetear tu contraseña.
       </div>
       <div style="margin-bottom:16px">
-        <div style="font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px">Email</div>
+        <div style="font-size:12px;font-weight:600;color:#3A5435;margin-bottom:5px">Tu email</div>
         <input type="email" id="forgot-email" placeholder="tu@email.com" autocomplete="email"
           style="width:100%;padding:10px 12px;border:1px solid #b0cca8;border-radius:6px;font-size:14px;box-sizing:border-box;background:#fff;color:#1A2E18">
       </div>
       <button id="forgot-btn" onclick="authForgotPassword()"
-        style="width:100%;padding:12px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer">Enviar link de recuperación</button>
+        style="width:100%;padding:12px;background:#2E7A44;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer">Solicitar recuperación</button>
       <div style="text-align:center;margin-top:12px">
         <span onclick="authSwitchTab('login')" style="font-size:12px;color:#2E7A44;cursor:pointer">← Volver al inicio de sesión</span>
       </div>
@@ -1278,29 +1280,42 @@ async function authRegister() {
   await onAuthSuccess(data.user);
 }
 
-async function authForgotPassword() {
+function authForgotPassword() {
   const emailEl = document.getElementById('forgot-email') || document.getElementById('login-email');
   const email = emailEl?.value.trim();
-  if (!email) { setAuthMsg('Ingresá tu email.'); return; }
-  const btn = document.getElementById('forgot-btn');
-  if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; }
-  const { error } = await supaClient.auth.resetPasswordForEmail(email);
-  if (error) {
-    const msgs = {
-      'User already registered':          'Ya existe una cuenta con ese email.',
-      'Signups not allowed for this instance': 'El registro está deshabilitado. Contactá al administrador.',
-      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
-      'email rate limit exceeded':        'Límite alcanzado. Esperá unos minutos.',
-      'Failed to fetch':                  'Error de conexión. Verificá tu internet.',
-    };
-    setAuthMsg(msgs[error.message] || error.message);
-    return;
-  }
-  const btn2 = document.getElementById('forgot-btn');
-  if (btn2) { btn2.textContent = 'Enviar link de recuperación'; btn2.disabled = false; }
-  setAuthMsg('✓ Email enviado. Revisá tu casilla de correo.', false);
+  if (!email) { setAuthMsg('Ingresá tu email primero.'); return; }
+  const subject = encodeURIComponent('Recuperación de contraseña — Inventario Tarmed');
+  const body = encodeURIComponent('Hola Santiago,\n\nOlvidé mi contraseña del Inventario Tarmed.\n\nMi email de acceso es: ' + email + '\n\nGracias.');
+  window.location.href = 'mailto:santiagojrexach@gmail.com?subject=' + subject + '&body=' + body;
+  setAuthMsg('✓ Se abrió tu app de correo con el mensaje listo. Envialo y te contactamos a la brevedad.', false);
 }
 
+function showChangePwdModal() {
+  document.getElementById('chgpwd-new').value = '';
+  document.getElementById('chgpwd-confirm').value = '';
+  document.getElementById('chgpwd-msg').textContent = '';
+  document.getElementById('chgpwd-modal').style.display = 'block';
+}
+function closeChangePwdModal() {
+  document.getElementById('chgpwd-modal').style.display = 'none';
+}
+async function doChangePwd() {
+  const newPwd = document.getElementById('chgpwd-new').value;
+  const confirm = document.getElementById('chgpwd-confirm').value;
+  const msg = document.getElementById('chgpwd-msg');
+  if (newPwd.length < 6) { msg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+  if (newPwd !== confirm) { msg.textContent = 'Las contraseñas no coinciden.'; return; }
+  msg.style.color = 'var(--tm)';
+  msg.textContent = 'Guardando...';
+  const { error } = await supaClient.auth.updateUser({ password: newPwd });
+  if (error) {
+    msg.style.color = '#C04040';
+    msg.textContent = error.message;
+    return;
+  }
+  closeChangePwdModal();
+  showToast('✓ Contraseña actualizada correctamente.');
+}
 async function authLogout() {
   await supaClient.auth.signOut();
   supaCurrentUser = null;
@@ -5120,6 +5135,7 @@ function loadMoreRetiros() {
 
 
 
+
 <!-- MODALES (movidos al body para que position:fixed funcione) -->
 <div class="mbd" id="qd-modal">
   <div class="mbox">
@@ -5182,6 +5198,31 @@ function loadMoreRetiros() {
 
 
 
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="mbd" id="chgpwd-modal">
+  <div class="mbox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <strong style="font-size:15px">Cambiar contraseña</strong>
+      <button onclick="closeChangePwdModal()" style="border:none;background:none;cursor:pointer;font-size:18px;color:var(--tm)">×</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="fl">Nueva contraseña (mínimo 6 caracteres)</label>
+      <input type="password" id="chgpwd-new" placeholder="••••••••"
+        style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--rsm);font-size:14px;box-sizing:border-box">
+    </div>
+    <div style="margin-bottom:16px">
+      <label class="fl">Confirmar nueva contraseña</label>
+      <input type="password" id="chgpwd-confirm" placeholder="••••••••"
+        style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--rsm);font-size:14px;box-sizing:border-box">
+    </div>
+    <div id="chgpwd-msg" style="font-size:12px;text-align:center;margin-bottom:12px;min-height:18px;color:#C04040"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeChangePwdModal()" class="tbtn">Cancelar</button>
+      <button onclick="doChangePwd()" class="btnacc">Guardar contraseña</button>
+    </div>
+  </div>
+</div>
 
 <!-- CONFIRM MODAL -->
 <div class="mbd" id="confirm-modal" style="z-index:500">
