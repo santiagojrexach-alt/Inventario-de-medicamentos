@@ -317,6 +317,7 @@ button:hover{background:var(--ps)}
   .topbar-more{display:flex}
   .inv-disp-btn{font-size:8px!important;padding:1px 3px!important}
 }
+@media(max-width:600px){.analisis-idx{flex-wrap:wrap;overflow-x:visible}.analisis-idx-btn{flex:1;min-width:calc(33% - 6px);text-align:center}}
 @media(max-width:360px){
   .wrap{padding:.2rem}
   .tab{padding:5px 7px;font-size:10px}
@@ -330,13 +331,10 @@ button:hover{background:var(--ps)}
 }
 /* ── ANÁLISIS: section headers ──────────────────────────── */
 .analisis-idx{display:none;position:sticky;top:0;z-index:15;background:var(--pc);border:1px solid var(--bdl);border-radius:var(--rmd);padding:5px 8px;margin-bottom:.45rem;box-shadow:0 2px 6px rgba(0,0,0,.07)}
-@media(max-width:600px){.analisis-idx{flex-wrap:wrap;overflow-x:visible}}
 .analisis-idx::-webkit-scrollbar{display:none}
 .analisis-idx-inner{display:flex;gap:4px;white-space:nowrap}
 .analisis-idx-btn{font-size:10px;padding:3px 9px;border:1px solid var(--bdl);border-radius:99px;background:var(--pc);color:var(--tm);cursor:pointer;flex-shrink:0}
-@media(max-width:600px){.analisis-idx-btn{flex:1;min-width:calc(33% - 6px);text-align:center}}
 .analisis-idx-btn:hover{background:var(--ps);color:var(--t1)}
-@media(max-width:600px){.analisis-idx{display:block}}
 .analisis-section-hdr{
   font-size:11px;font-weight:700;color:var(--tm);
   text-transform:uppercase;letter-spacing:.1em;
@@ -729,7 +727,7 @@ button:hover{background:var(--ps)}
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-consumo')">💊 Consumo</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-proj')">📈 Proyección</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-detalle')">🔬 Detalle</button>
-      <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-residentes')">👤 Residentes</button>
+      <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-residentes')">👤 Dispensaciones</button>
       <button class="analisis-idx-btn" onclick="scrollToAnalisisSection('sec-audit')">📋 Cambios</button>
     </div>
   </div>
@@ -997,6 +995,7 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
 
 
 
@@ -4961,6 +4960,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
