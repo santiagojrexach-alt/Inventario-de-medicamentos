@@ -509,7 +509,7 @@ button:hover{background:var(--ps)}
 <!-- GLOBAL SEARCH -->
 <div class="global-search" id="global-search-bar">
   <span style="font-size:15px;color:var(--tm)">🔍</span>
-  <input type="text" id="global-q" placeholder="Buscar... (medicamento, lab, pedido) · Atajo: /" oninput="globalSearch()" onkeydown="if(event.key==='Escape'){clearGlobalSearch();toggleGlobalSearch(false)}">
+  <input type="text" id="global-q" placeholder="Buscar..." oninput="globalSearch()" onkeydown="if(event.key==='Escape'){clearGlobalSearch();toggleGlobalSearch(false)}">
   <button onclick="clearGlobalSearch();toggleGlobalSearch(false)" style="border:none;background:none;cursor:pointer;color:var(--tm);font-size:18px;padding:0">×</button>
 </div>
 <div class="gsearch-results" id="gsearch-results"></div>
@@ -571,7 +571,7 @@ button:hover{background:var(--ps)}
   <div id="pedido-ciclo" style="display:none"></div>
   <div class="ped-sticky" id="ped-sticky">
     <span style="font-size:13px;font-weight:700;white-space:nowrap">🛒 <span id="ped-sticky-count">0</span>/10</span>
-    <div id="ped-sticky-labs" style="display:flex;gap:4px;flex-wrap:wrap;flex:1;font-size:10px;color:var(--tm)"></div>
+    <div id="ped-sticky-labs" style="display:flex;gap:4px;flex-wrap:nowrap;flex:1;font-size:10px;color:var(--tm);overflow-x:auto;scrollbar-width:none"></div>
     <button class="tbtn" onclick="clearPedido()" style="font-size:11px;padding:3px 8px">✕ Limpiar</button>
     <button class="tbtn" onclick="autoSel()" style="font-size:11px;padding:3px 8px">✦ Auto</button>
     <button class="tbtn" onclick="openRecepcion()" style="font-size:11px;padding:3px 8px" title="Registrar medicamentos recibidos de Tarmed">📥 Recibido</button>
@@ -591,7 +591,7 @@ button:hover{background:var(--ps)}
     </div>
     <div id="tbar-body" style="display:none">
   <div id="tbar-wrap" class="tbar ok">
-      <div style="flex:1"><div style="font-size:13px;font-weight:700"><span id="used-boxes">0</span>/10 cajas</div><div id="lab-prog" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;font-size:10px;color:var(--tm)"></div></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700"><span id="used-boxes">0</span>/10 cajas</div><div id="lab-prog" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;font-size:10px;color:var(--tm);max-height:44px;overflow:hidden"></div></div>
     </div>
   </div>
       <div style="text-align:right"><div style="font-size:22px;font-weight:700"><span id="rem-boxes">10</span></div><div style="font-size:10px;color:var(--tm)">restantes</div></div>
@@ -1026,6 +1026,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1142,7 +1143,7 @@ function buildAuthBoxHTML() {
     </div>
     <div id="auth-msg" style="font-size:12px;text-align:center;margin-top:12px;min-height:18px;color:#C04040"></div>
     <hr style="border:none;border-top:1px solid #b0cca8;margin:16px 0">
-    <div style="font-size:11px;color:#5A7855;text-align:center;margin-bottom:8px">¿Ya tenés un inventario guardado en JSON?</div>
+    <div style="font-size:11px;color:#5A7855;text-align:center;margin-bottom:8px">¿Migrás desde una versión anterior?</div>
     <label style="display:block;text-align:center;font-size:12px;color:#2E7A44;cursor:pointer;font-weight:600">
       📂 Importar JSON existente
       <input type="file" accept=".json" onchange="supaImportFromJSON(event)" style="display:none">
@@ -3336,7 +3337,14 @@ function renderPedConf() {
       '<p style="font-size:12px;color:var(--tm)">Usá "+ Agregar al pedido" para armar el pedido.</p>';
     return;
   }
-  document.getElementById('pedido-conf').innerHTML = items.map(buildPedConfRow).join('');
+  // Agrupar por nombre+dosis+lab para evitar filas duplicadas
+  const grouped = {};
+  items.forEach(i => {
+    const key = `${i.name}|${i.dose}|${i.lab}`;
+    if (grouped[key]) grouped[key].cajas += i.cajas;
+    else grouped[key] = {...i};
+  });
+  document.getElementById('pedido-conf').innerHTML = Object.values(grouped).map(buildPedConfRow).join('');
 }
 function applyPedidoToStock(items) {
   items.forEach(i => {
@@ -5059,6 +5067,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
