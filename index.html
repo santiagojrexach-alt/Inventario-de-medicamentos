@@ -28,10 +28,16 @@
 body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--t1);font-size:13px;min-height:100vh;transition:background .25s,color .2s}
 .wrap{padding:.55rem;max-width:960px;margin:0 auto}
 .large-text{font-size:15px!important}
-.large-text .tab{font-size:13px!important}
+.large-text .tab,.large-text .card,.large-text .sec,.large-text p,.large-text label,
+.large-text input,.large-text select,.large-text button,.large-text td,.large-text th,
+.large-text .fl,.large-text .topbar-name{font-size:14px!important}
+.large-text .tbar-sub,.large-text .app-subtitle{font-size:12px!important}
 .xlarge-text{font-size:17px!important}
-.xlarge-text .tab{font-size:14px!important}
-.xlarge-text .mcv{font-size:28px!important}
+.xlarge-text .tab,.xlarge-text .card,.xlarge-text .sec,.xlarge-text p,.xlarge-text label,
+.xlarge-text input,.xlarge-text select,.xlarge-text button,.xlarge-text td,.xlarge-text th,
+.xlarge-text .fl{font-size:16px!important}
+.xlarge-text .mcv{font-size:30px!important}
+.xlarge-text .tbar-sub,.xlarge-text .app-subtitle{font-size:13px!important}
 /* TOPBAR */
 .back-btn{display:none;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--tm);font-size:12px;padding:4px 8px;border-radius:var(--rsm);flex-shrink:0}
 .back-btn:hover{background:var(--ps);color:var(--t1)}
@@ -323,10 +329,10 @@ button:hover{background:var(--ps)}
   .nav-primary,.nav-secondary{padding:2px;gap:2px}
 }
 /* ── ANÁLISIS: section headers ──────────────────────────── */
-.analisis-idx{display:none;position:sticky;top:0;z-index:15;background:var(--pc);border:1px solid var(--bdl);border-radius:var(--rmd);padding:5px 8px;margin-bottom:.45rem;box-shadow:0 2px 6px rgba(0,0,0,.07);overflow-x:auto;scrollbar-width:none}
+.analisis-idx{display:none;position:sticky;top:0;z-index:15;background:var(--pc);border:1px solid var(--bdl);border-radius:var(--rmd);padding:5px 8px;margin-bottom:.45rem;box-shadow:0 2px 6px rgba(0,0,0,.07);overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
 .analisis-idx::-webkit-scrollbar{display:none}
 .analisis-idx-inner{display:flex;gap:4px;white-space:nowrap}
-.analisis-idx-btn{font-size:10px;padding:3px 9px;border:1px solid var(--bdl);border-radius:99px;background:var(--pc);color:var(--tm);cursor:pointer;flex-shrink:0}
+.analisis-idx-btn{font-size:10px;padding:3px 9px;border:1px solid var(--bdl);border-radius:99px;background:var(--pc);color:var(--tm);cursor:pointer;flex-shrink:0;flex:1;min-width:calc(50% - 8px);text-align:center}
 .analisis-idx-btn:hover{background:var(--ps);color:var(--t1)}
 @media(max-width:600px){.analisis-idx{display:block}}
 .analisis-section-hdr{
@@ -874,15 +880,19 @@ button:hover{background:var(--ps)}
     <div style="font-size:11px;color:var(--tm)">El tema cambia el fondo, las superficies y el acento. Combiná con el modo oscuro.</div>
   </div>
   <div class="card">
-    <div class="sec">Identidad del servicio</div>
+    <div class="sec">ID</div>
     <div style="font-size:11px;color:var(--tm);margin-bottom:8px">Los cambios se guardan automáticamente.</div>
     <div class="frow">
-      <div><label class="fl">Nombre del servicio (aparece en PDFs y topbar)</label>
+      <div><label class="fl">Institución</label>
         <input type="text" id="cfg-name" placeholder="ej. HZGA Gral. Manuel Belgrano">
       </div>
-      <div><label class="fl">Subtítulo (breve, ej. "R1 Psiquiatría")</label>
-        <input type="text" id="cfg-subtitle" placeholder="ej. R1 Psiquiatría">
+      <div><label class="fl">Servicio (breve, ej. "Psiquiatría")</label>
+        <input type="text" id="cfg-subtitle" placeholder="ej. Psiquiatría">
       </div>
+    </div>
+    <div style="margin-top:8px">
+      <label class="fl">Profesional</label>
+      <input type="text" id="cfg-professional" placeholder="ej. Santiago J. Rexach" oninput="cfg.professional=this.value;updateTitleBar();saveState()">
     </div>
   </div>
   <div class="card">
@@ -985,6 +995,10 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
+
+
+
 
 
 
@@ -1512,7 +1526,8 @@ const DEMO_INV=[
   {"name":"Zolpidem","group":"Compuestos Z / Otros","lots":[{"dose":10,"lab":"Bagó","qty":1,"min":1,"comps":30,"ddd":0,"notes":"","ven":"06/2028"}]}
 ];
 // ══ STORE: estado persistido (se serializa en localStorage) ══
-const CFG_DEFAULTS = { day:7, ahead:7, name:'', subtitle:'', venDays:180, themeIdx:0, multiusuario:false, largeText:false, favoritos:[] };
+const CFG_DEFAULTS = { day:7, ahead:7, name:'', subtitle:'',
+  professional: '', venDays:180, themeIdx:0, multiusuario:false, largeText:false, favoritos:[] };
 const STORE = {
   inventory:   [],              // array de medicamentos con lotes
   historial:   [],              // historial de pedidos
@@ -1737,6 +1752,8 @@ function syncConfigUI() {
   document.getElementById('cfg-ahead').value     = cfg.ahead;
   document.getElementById('cfg-name').value      = cfg.name || '';
   document.getElementById('cfg-subtitle').value  = cfg.subtitle || '';
+  const profEl = document.getElementById('cfg-professional');
+  if (profEl) profEl.value = cfg.professional || '';
   document.getElementById('cfg-ven-days').value  = VEN_ALERT_DAYS;
   syncResidentesUI();
   syncMultiusuarioUI();
@@ -1745,7 +1762,11 @@ function updateTitleBar(){
   if(!cfg) return;
   if(cfg.name)document.getElementById('app-title-label').textContent=cfg.name.split('—')[0].trim()||'Inventario Tarmed';
   const sub=document.getElementById('app-subtitle-label');
-  if(sub){if(cfg.subtitle){sub.textContent=cfg.subtitle;sub.style.display='block';}else{sub.style.display='none';}}
+  if(sub){
+    const parts = [cfg.subtitle, cfg.professional].filter(Boolean);
+    if(parts.length){sub.textContent=parts.join(' · ');sub.style.display='block';}
+    else{sub.style.display='none';}
+  }
 }
 
 // ══ EXPORTAR / IMPORTAR ═════════════════════════════════
@@ -3665,7 +3686,7 @@ function renderMovMes() {
       <tr><th>Fecha</th><th>Tipo</th><th>Medicamento</th><th>Cajas</th><th>Detalle</th></tr>
       ${movs.map(m => `
         <tr>
-          <td>${m.fecha}</td>
+          <td>${fmtFecha(m.fecha)}</td>
           <td class="${tipoCls[m.tipo]}">${tipoLabel[m.tipo]}</td>
           <td>${m.name} ${m.dose}mg</td>
           <td class="${tipoCls[m.tipo]}">${m.tipo==='dispensacion'||m.tipo==='ajuste'?'−':'+'} ${m.qty}</td>
@@ -3770,7 +3791,7 @@ function renderResidentesStats() {
     el.innerHTML = '<p style="font-size:12px;color:var(--tm);padding:8px 0">Sin datos de residente. Activá multiusuario en Configuración y registrá dispensaciones con nombre.</p>';
     return;
   }
-  // Agrupar por residente
+  // Agrupar por quien dispensó
   const byRes = {};
   conRes.forEach(r => {
     if (!byRes[r.residente]) byRes[r.residente] = { total: 0, cajas: 0, meds: {} };
@@ -4515,7 +4536,7 @@ const TUT_STEPS=[
   {tab:'pedido',     title:'Pedido a Tarmed',       arrow:'arrow-top',  anchorId:'tab-btn-pedido',     body:'Armá el pedido mensual: máx. 10 cajas totales, máx. 3 por laboratorio. Los medicamentos con déficit aparecen primero en naranja. Usá <strong>✦ Auto</strong> para que la app complete el pedido automáticamente.'},
   {tab:'vencimientos',title:'Vencimientos',         arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
   {tab:'agregar',    title:'Agregar medicamento',   arrow:'arrow-top',  anchorId:'tab-btn-agregar',    body:'Sumá lotes nuevos al inventario. Si el medicamento ya existe, el lote nuevo se agrega sin duplicar. Podés duplicar un lote existente con el botón 📋 para cambiar solo el vencimiento.'},
-  {tab:'config',     title:'Configuración',         arrow:'arrow-top',  anchorId:'tab-btn-config',     body:'Ajustá el nombre del servicio, el día de retiro en Tarmed, y los días de alerta de vencimiento. Desde acá también podés <strong>generar una versión limpia</strong> para compartir con compañeros.'},
+  {tab:'config',     title:'Configuración',         arrow:'arrow-top',  anchorId:'tab-btn-config',     body:'Configurá tu ID: Institución, Servicio y Profesional. También ajustá el día de retiro en Tarmed, los días de alerta de vencimiento, el tamaño de texto y exportá un backup JSON.'},
 ];
 let tutIdx=0;
 // ══ TUTORIAL INTERACTIVO ════════════════════════════════
@@ -4533,6 +4554,9 @@ function tutNext(){
   tutIdx++;
   if(tutIdx>=TUT_STEPS.length){tutSkip();showToast('✓ Tutorial completado. ¡Ya sabés todo lo que necesitás!');return;}
   renderTutStep();
+}
+function tutBack(){
+  if(tutIdx>0){tutIdx--;renderTutStep();}
 }
 function positionTutBox() {
   const step   = TUT_STEPS[tutIdx];
@@ -4581,6 +4605,8 @@ function renderTutStep(){
   document.getElementById('tut-body').innerHTML         = step.body;
   document.getElementById('tut-step-label').textContent = `Paso ${tutIdx+1} de ${TUT_STEPS.length}`;
   document.getElementById('tut-next-btn').textContent   = tutIdx===TUT_STEPS.length-1 ? 'Finalizar ✓' : 'Siguiente →';
+  const backBtn = document.getElementById('tut-back-btn');
+  if (backBtn) backBtn.style.display = tutIdx === 0 ? 'none' : 'inline-block';
   if (box) box.className = 'tut-box ' + step.arrow;
   requestAnimationFrame(() => {
     const anchor = document.getElementById(step.anchorId);
@@ -4935,6 +4961,10 @@ function loadMoreRetiros() {
 
 
 
+
+
+
+
 <!-- MODALES (movidos al body para que position:fixed funcione) -->
 <div class="mbd" id="qd-modal">
   <div class="mbox">
@@ -5020,6 +5050,7 @@ function loadMoreRetiros() {
     <div id="tut-body"></div>
     <div class="tut-actions">
       <button class="tut-skip" onclick="tutSkip()">Saltar tutorial</button>
+      <button id="tut-back-btn" onclick="tutBack()" style="display:none;font-size:12px;padding:6px 14px;border:1px solid var(--bdl);background:var(--ps);color:var(--t2);border-radius:var(--rsm);cursor:pointer">← Atrás</button>
       <button class="tut-next" id="tut-next-btn" onclick="tutNext()">Siguiente →</button>
     </div>
   </div>
