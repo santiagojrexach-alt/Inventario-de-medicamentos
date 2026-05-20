@@ -968,62 +968,20 @@ button:hover{background:var(--ps)}
 
 
 <!-- QUICK DISPATCH MODAL -->
-<div class="mbd" id="qd-modal">
-  <div class="mbox">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
-      <span style="font-size:14px;font-weight:700" id="qd-title">Dispensación rápida</span>
-      <button class="delbtn" onclick="closeQD()" style="font-size:18px">×</button>
-    </div>
-    <div id="qd-content"></div>
-    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
-      <button onclick="closeQD()">Cancelar</button>
-      <button class="btnred" id="qd-confirm-btn">🖐 Dispensar</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- MODAL RECEPCIÓN DE PEDIDO -->
-<div class="mbd" id="recepcion-modal">
-  <div class="mbox" style="max-width:500px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
-      <span style="font-size:14px;font-weight:700">📥 Recepción de pedido</span>
-      <button class="delbtn" onclick="closeRecepcion()" style="font-size:18px">×</button>
-    </div>
-    <p style="font-size:12px;color:var(--tm);margin-bottom:10px">Indicá cuántas cajas de cada medicamento recibiste. El stock se actualizará automáticamente.</p>
-    <div id="recepcion-content"></div>
-    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
-      <button onclick="closeRecepcion()">Cancelar</button>
-      <button class="btnacc" onclick="confirmarRecepcion()">✓ Actualizar stock</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- MODAL EDITAR LOTE -->
-<div class="mbd" id="lot-modal">
-  <div class="mbox">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
-      <span style="font-size:14px;font-weight:700" id="lot-modal-title">Editar lote</span>
-      <button class="delbtn" onclick="closeLotModal()" style="font-size:18px">×</button>
-    </div>
-    <div id="lot-modal-content"></div>
-    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
-      <button onclick="closeLotModal()">Cancelar</button>
-      <button class="btnacc" onclick="saveLotModal()">Guardar</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- MODAL EDICIÓN -->
-<div class="mbd" id="edit-modal">
-  <div class="mbox">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem"><span style="font-size:14px;font-weight:700" id="modal-title">Editar</span><button class="delbtn" onclick="closeModal()" style="font-size:18px">×</button></div>
-    <div id="modal-content"></div>
-    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end"><button onclick="closeModal()">Cancelar</button><button class="btnacc" id="modal-save-btn">Guardar</button></div>
-  </div>
-</div>
+
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+
 
 
 
@@ -4945,6 +4903,57 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
+
+<!-- MODALES (movidos al body para que position:fixed funcione) -->
+<div class="mbd" id="qd-modal">
+  <div class="mbox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <span style="font-size:14px;font-weight:700" id="qd-title">Dispensación rápida</span>
+      <button class="delbtn" onclick="closeQD()" style="font-size:18px">×</button>
+    </div>
+    <div id="qd-content"></div>
+    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
+      <button onclick="closeQD()">Cancelar</button>
+      <button class="btnred" id="qd-confirm-btn">🖐 Dispensar</button>
+    </div>
+  </div>
+</div>
+<div class="mbd" id="recepcion-modal">
+  <div class="mbox" style="max-width:500px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <span style="font-size:14px;font-weight:700">📥 Recepción de pedido</span>
+      <button class="delbtn" onclick="closeRecepcion()" style="font-size:18px">×</button>
+    </div>
+    <p style="font-size:12px;color:var(--tm);margin-bottom:10px">Indicá cuántas cajas de cada medicamento recibiste. El stock se actualizará automáticamente.</p>
+    <div id="recepcion-content"></div>
+    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
+      <button onclick="closeRecepcion()">Cancelar</button>
+      <button class="btnacc" onclick="confirmarRecepcion()">✓ Actualizar stock</button>
+    </div>
+  </div>
+</div>
+<div class="mbd" id="lot-modal">
+  <div class="mbox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <span style="font-size:14px;font-weight:700" id="lot-modal-title">Editar lote</span>
+      <button class="delbtn" onclick="closeLotModal()" style="font-size:18px">×</button>
+    </div>
+    <div id="lot-modal-content"></div>
+    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
+      <button onclick="closeLotModal()">Cancelar</button>
+      <button class="btnacc" onclick="saveLotModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="mbd" id="edit-modal">
+  <div class="mbox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem"><span style="font-size:14px;font-weight:700" id="modal-title">Editar</span><button class="delbtn" onclick="closeModal()" style="font-size:18px">×</button></div>
+    <div id="modal-content"></div>
+    <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end"><button onclick="closeModal()">Cancelar</button><button class="btnacc" id="modal-save-btn">Guardar</button></div>
+  </div>
+</div>
+
 
 
 
