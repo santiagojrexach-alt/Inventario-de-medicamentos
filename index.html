@@ -1031,6 +1031,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1090,9 +1091,9 @@ function buildAuthBoxHTML() {
     </div>
     <div style="display:flex;background:#E2EEE2;border-radius:6px;padding:3px;margin-bottom:20px">
       <button id="tab-login" onclick="authSwitchTab('login')"
-        style="flex:1;padding:8px;border:none;background:#fff;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;color:#1A2E18">Ingresar</button>
+        style="flex:1;padding:9px;border:none;background:#fff;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;color:#1A2E18;box-shadow:0 1px 4px rgba(0,0,0,.15)">Ingresar</button>
       <button id="tab-register" onclick="authSwitchTab('register')"
-        style="flex:1;padding:8px;border:none;background:none;border-radius:4px;font-size:13px;cursor:pointer;color:#5A7855">Registrarse</button>
+        style="flex:1;padding:9px;border:none;background:none;border-radius:5px;font-size:13px;font-weight:400;cursor:pointer;color:#5A7855">Registrarse</button>
     </div>
     <div id="auth-login">
       <div style="margin-bottom:12px">
@@ -1161,8 +1162,20 @@ function hideAuthScreen() {
 function authSwitchTab(tab) {
   document.getElementById('auth-login').style.display    = tab === 'login'    ? '' : 'none';
   document.getElementById('auth-register').style.display = tab === 'register' ? '' : 'none';
-  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  const btnLogin = document.getElementById('tab-login');
+  const btnReg   = document.getElementById('tab-register');
+  if (btnLogin) {
+    btnLogin.style.background  = tab === 'login' ? '#fff' : 'none';
+    btnLogin.style.fontWeight  = tab === 'login' ? '700' : '400';
+    btnLogin.style.color       = tab === 'login' ? '#1A2E18' : '#5A7855';
+    btnLogin.style.boxShadow   = tab === 'login' ? '0 1px 4px rgba(0,0,0,.15)' : 'none';
+  }
+  if (btnReg) {
+    btnReg.style.background  = tab === 'register' ? '#fff' : 'none';
+    btnReg.style.fontWeight  = tab === 'register' ? '700' : '400';
+    btnReg.style.color       = tab === 'register' ? '#1A2E18' : '#5A7855';
+    btnReg.style.boxShadow   = tab === 'register' ? '0 1px 4px rgba(0,0,0,.15)' : 'none';
+  }
   document.getElementById('auth-msg').textContent = '';
 }
 function setAuthMsg(msg, isError=true) {
@@ -1174,7 +1187,13 @@ function setAuthMsg(msg, isError=true) {
 function setAuthLoading(loading) {
   ['login-btn','reg-btn'].forEach(id => {
     const btn = document.getElementById(id);
-    if (btn) btn.disabled = loading;
+    if (!btn) return;
+    btn.disabled = loading;
+    if (!loading) {
+      btn.style.opacity = '1';
+      if (id === 'login-btn') btn.textContent = 'Ingresar';
+      if (id === 'reg-btn')   btn.textContent = 'Crear cuenta';
+    }
   });
 }
 
@@ -1184,6 +1203,9 @@ async function authLogin() {
   if (!email || !pass) { setAuthMsg('Completá email y contraseña.'); return; }
   setAuthLoading(true);
   setAuthMsg('');
+  // Feedback visual en el botón
+  const btn = document.getElementById('login-btn');
+  if (btn) { btn.textContent = 'Ingresando...'; btn.style.opacity = '0.8'; }
   const { data, error } = await supaClient.auth.signInWithPassword({ email, password: pass });
   setAuthLoading(false);
   if (error) {
@@ -1209,6 +1231,9 @@ async function authRegister() {
   if (pass !== pass2)   { setAuthMsg('Las contraseñas no coinciden.'); return; }
   setAuthLoading(true);
   setAuthMsg('');
+  // Feedback visual en el botón
+  const btn = document.getElementById('reg-btn');
+  if (btn) { btn.textContent = 'Creando cuenta...'; btn.style.opacity = '0.8'; }
   const { data, error } = await supaClient.auth.signUp({ email, password: pass });
   setAuthLoading(false);
   if (error) {
@@ -4986,6 +5011,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
