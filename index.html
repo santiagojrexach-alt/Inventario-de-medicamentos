@@ -3846,6 +3846,9 @@ function renderAuditLog() {
   ).join('');
 }
 function renderAnalisis() {
+  // Mostrar el índice de navegación
+  const idx = document.getElementById('analisis-idx');
+  if (idx) idx.style.display = 'flex';
   renderHBars();
   renderStockDays();
   renderStockVsMin();
