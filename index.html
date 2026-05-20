@@ -1030,6 +1030,7 @@ button:hover{background:var(--ps)}
 
 
 
+
 <script>
 // ══ SUPABASE — cliente y autenticación ══════════════════════
 const SUPA_URL = 'https://evhkahafyyvpyzlqhcgw.supabase.co';
@@ -1222,7 +1223,7 @@ async function authRegister() {
     return;
   }
   if (data.user && !data.session) {
-    setAuthMsg('¡Cuenta creada! Revisá tu email para confirmar la cuenta.', false);
+    setAuthMsg('✓ ¡Cuenta creada! Revisá tu email y hacé clic en el link de confirmación para ingresar.', false);
     return;
   }
   await onAuthSuccess(data.user);
@@ -1379,6 +1380,14 @@ async function initApp() {
   if (appInitialized) return;
   appInitialized = true;
   console.log('[Tarmed] initApp iniciando...');
+  // Detectar redirect de confirmación de email o recuperación de contraseña
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    setLoadingMsg('Verificando cuenta...');
+    // Supabase procesa el token automáticamente via onAuthStateChange
+    // Limpiar el hash de la URL para que no quede visible
+    history.replaceState(null, '', window.location.pathname);
+  }
   // Esperar a que el SDK de Supabase esté disponible (máx 5s)
   let attempts = 0;
   while (typeof window.supabase === 'undefined' && attempts < 50) {
@@ -4977,6 +4986,7 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
+
 
 
 
