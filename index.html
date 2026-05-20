@@ -1409,9 +1409,9 @@ async function initApp() {
   const hash = window.location.hash;
   if (hash && hash.includes('access_token')) {
     setLoadingMsg('Verificando cuenta...');
-    // Supabase procesa el token automáticamente via onAuthStateChange
-    // Limpiar el hash de la URL para que no quede visible
     history.replaceState(null, '', window.location.pathname);
+    // Esperar a que Supabase procese el token del hash
+    await new Promise(r => setTimeout(r, 1000));
   }
   // Esperar a que el SDK de Supabase esté disponible (máx 5s)
   let attempts = 0;
