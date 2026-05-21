@@ -302,8 +302,8 @@ button:hover{background:var(--ps)}
 .tut-overlay{position:absolute;inset:0;background:rgba(0,0,0,.28);pointer-events:none}
 .tut-box{position:absolute;background:var(--t1);color:var(--pc);border-radius:var(--rmd);padding:12px 14px;width:min(280px,85vw);box-shadow:0 4px 20px rgba(0,0,0,.22);pointer-events:all;font-size:12px;line-height:1.6}
 .tut-box::before{content:'';position:absolute;width:10px;height:10px;background:var(--t1);transform:rotate(45deg)}
-.tut-box.arrow-top::before{top:-5px;left:24px}
-.tut-box.arrow-bottom::before{bottom:-5px;left:24px}
+.tut-box.arrow-top::before{top:-5px;left:var(--arrow-left,24px)}
+.tut-box.arrow-bottom::before{bottom:-5px;left:var(--arrow-left,24px)}
 .tut-title{font-size:13px;font-weight:700;margin-bottom:5px}
 .tut-step-label{font-size:10px;opacity:.65;margin-bottom:6px}
 .tut-actions{display:flex;gap:7px;margin-top:10px;justify-content:flex-end;align-items:center}
@@ -4748,28 +4748,28 @@ function positionTutBox() {
   const vh    = window.innerHeight;
   const boxW  = Math.min(280, vw * 0.85);
   const boxH  = box.offsetHeight || 180;
-  let top = 80, left = 20, arrow = 'arrow-top';
+  let top = 80, left = 20, arrow = 'arrow-top', arrowLeft = 24;
 
   if (anchor) {
     const r = anchor.getBoundingClientRect();
-    left = r.left - 4;
-    // Si hay espacio debajo del anchor, poner el box debajo con flecha arriba
+    const anchorCX = r.left + r.width / 2;
+    // Centrar el box sobre el anchor
+    left = anchorCX - boxW / 2;
+    left = Math.max(8, Math.min(left, vw - boxW - 8));
+    // Flecha apunta al centro del anchor
+    arrowLeft = Math.round(anchorCX - left - 8);
+    arrowLeft = Math.max(10, Math.min(arrowLeft, boxW - 26));
+    // Vertical
     if (r.bottom + 12 + boxH < vh - 20) {
-      top   = r.bottom + 12;
-      arrow = 'arrow-top';
+      top = r.bottom + 12; arrow = 'arrow-top';
     } else {
-      // Poner el box arriba del anchor con flecha abajo
-      top   = r.top - boxH - 18;
-      arrow = 'arrow-bottom';
+      top = r.top - boxH - 18; arrow = 'arrow-bottom';
     }
   }
 
-  // Actualizar clase de flecha
   box.className = 'tut-box ' + arrow;
-
-  // Clampear
+  box.style.setProperty('--arrow-left', arrowLeft + 'px');
   top  = Math.max(8, top);
-  left = Math.max(8, Math.min(left, vw - boxW - 12));
   box.style.top   = top  + 'px';
   box.style.left  = left + 'px';
   box.style.width = boxW + 'px';
