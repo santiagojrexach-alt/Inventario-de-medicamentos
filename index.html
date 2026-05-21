@@ -4743,21 +4743,31 @@ function positionTutBox() {
   const anchor = document.getElementById(step.anchorId);
   const box    = document.getElementById('tut-box');
   if (!box) return;
-  // El tut-box es position:fixed — las coords son relativas al viewport,
-  // igual que getBoundingClientRect(). NO sumar scrollY.
-  // Scroll al top para que el nav siempre sea visible al calcular posición.
   window.scrollTo({ top: 0, behavior: 'instant' });
-  const vw   = window.innerWidth;
-  const boxW = Math.min(280, vw * 0.85);
-  let top = 80, left = 20;
+  const vw    = window.innerWidth;
+  const vh    = window.innerHeight;
+  const boxW  = Math.min(280, vw * 0.85);
+  const boxH  = box.offsetHeight || 180;
+  let top = 80, left = 20, arrow = 'arrow-top';
+
   if (anchor) {
     const r = anchor.getBoundingClientRect();
     left = r.left - 4;
-    top  = step.arrow === 'arrow-top'
-      ? r.bottom + 12
-      : r.top - box.offsetHeight - 18;
+    // Si hay espacio debajo del anchor, poner el box debajo con flecha arriba
+    if (r.bottom + 12 + boxH < vh - 20) {
+      top   = r.bottom + 12;
+      arrow = 'arrow-top';
+    } else {
+      // Poner el box arriba del anchor con flecha abajo
+      top   = r.top - boxH - 18;
+      arrow = 'arrow-bottom';
+    }
   }
-  // Clampear para que no se salga del viewport
+
+  // Actualizar clase de flecha
+  box.className = 'tut-box ' + arrow;
+
+  // Clampear
   top  = Math.max(8, top);
   left = Math.max(8, Math.min(left, vw - boxW - 12));
   box.style.top   = top  + 'px';
