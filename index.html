@@ -4710,11 +4710,11 @@ function exportClean(){
 
 // ── TUTORIAL INTERACTIVO ──────────────────────────────────────
 const TUT_STEPS=[
-  {tab:'resumen',    title:'Panel de Resumen',     arrow:'arrow-top',  anchorId:'tab-btn-resumen',    body:'Tu centro de control. Muestra el stock total, alertas de medicamentos bajos o vencidos, y la proyección de cuánto te queda de cada uno según el consumo histórico.'},
+  {tab:'resumen',    title:'Inicio',               arrow:'arrow-top',  anchorId:'tab-btn-resumen',    body:'Tu centro de control. Muestra el stock total, alertas de medicamentos bajos o vencidos, y la proyección de cuánto te queda de cada uno según el consumo histórico.'},
   {tab:'inventario', title:'Inventario',            arrow:'arrow-top',  anchorId:'tab-btn-inventario', body:'Todos tus lotes ordenados por urgencia. Usá los botones − y + en cada chip para ajustar el stock rápido, o el botón <strong>Disp.</strong> para registrar una dispensación al instante.'},
-  {tab:'dispensacion',title:'Dispensación',         arrow:'arrow-top',  anchorId:'tab-btn-dispensacion',body:'Registrá cada medicamento que sale al paciente. Escribí el nombre (autocompleta), elegí el lote, anotá la cama o paciente y confirmá. El stock se descuenta automáticamente con opción de deshacer.'},
+  {tab:'dispensacion',title:'Dispensación',        arrow:'arrow-top',  anchorId:'tab-btn-dispensacion',body:'Registrá cada medicamento que sale al paciente. Escribí el nombre (autocompleta), elegí el lote, anotá la cama o paciente y confirmá. El stock se descuenta automáticamente con opción de deshacer.'},
   {tab:'pedido',     title:'Pedido a Tarmed',       arrow:'arrow-top',  anchorId:'tab-btn-pedido',     body:'Armá el pedido mensual: máx. 10 cajas totales, máx. 3 por laboratorio. Los medicamentos con déficit aparecen primero en naranja. Usá <strong>✦ Auto</strong> para que la app complete el pedido automáticamente.'},
-  {tab:'vencimientos',title:'Vencimientos',         arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
+  {tab:'vencimientos',title:'Vencimientos',        arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
   {tab:'agregar',    title:'Agregar medicamento',   arrow:'arrow-top',  anchorId:'tab-btn-agregar',    body:'Sumá lotes nuevos al inventario. Si el medicamento ya existe, el lote nuevo se agrega sin duplicar. Podés duplicar un lote existente con el botón 📋 para cambiar solo el vencimiento.'},
   {tab:'config',     title:'Configuración',         arrow:'arrow-top',  anchorId:'tab-btn-config',     body:'Configurá tu ID: Institución, Servicio y Profesional. También ajustá el día de retiro en Tarmed, los días de alerta de vencimiento, el tamaño de texto y exportá un backup JSON.'},
 ];
@@ -4766,14 +4766,9 @@ function positionTutBox() {
 }
 // tutSwitchTab: cambia el panel sin efectos secundarios de sTab()
 function tutSwitchTab(name) {
-  [...document.querySelectorAll('.tab-btn')].forEach(b => {
-    b.classList.toggle('active', b.id === 'tab-btn-' + name);
-  });
-  const cfgBtn = document.getElementById('tab-btn-config');
-  if (cfgBtn) cfgBtn.classList.toggle('active', name === 'config');
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  const panel = document.getElementById('tab-' + name);
-  if (panel) panel.classList.add('active');
+  // Llamar sTab directamente para cambiar el panel correctamente
+  sTab(name);
+  // Scroll al botón del tab para que sea visible
   const btn = document.getElementById('tab-btn-' + name);
   if (btn) btn.scrollIntoView({ block:'nearest', inline:'center', behavior:'instant' });
 }
