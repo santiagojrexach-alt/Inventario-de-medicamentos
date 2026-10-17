@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="apple-touch-icon" sizes="512x512" href="https://santiagojrexach-alt.github.io/Inventario-de-medicamentos/tarmed-icon-512.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="https://santiagojrexach-alt.github.io/Inventario-de-medicamentos/tarmed-icon-512.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2318302A'/><text y='.9em' font-size='80' x='10'>💊</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
 /* ══════════════════════════════════════════════════════
@@ -57,6 +56,10 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .dark-toggle.on::after{left:17px}
 .ibtn{width:36px;height:36px;border:1.5px solid var(--bd);border-radius:var(--rsm);background:var(--pc);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:background .15s}
 .ibtn:hover{background:var(--ps);border-color:var(--ac)}
+.btn-primary{background:var(--ac);color:#fff;border:none;border-radius:var(--rsm);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--acd)}
+.btn-ghost{background:transparent;color:var(--t1);border:1.5px solid var(--bd);border-radius:var(--rsm);padding:7px 14px;font-size:13px;cursor:pointer;transition:background .15s}
+.btn-ghost:hover{background:var(--ps)}
 .ibtn.acc{background:var(--ac);color:#fff;border-color:var(--ac)}
 .ibtn.acc:hover{background:var(--acd)}
 .ibtn svg{display:block;flex-shrink:0}
@@ -158,7 +161,7 @@ button:hover{background:var(--ps)}
 .tbtn{font-size:11px;padding:5px 10px;border:1px solid var(--bd);border-radius:var(--rsm);background:var(--pc);color:var(--t1);cursor:pointer;font-weight:500;white-space:nowrap}
 .tbtn:hover{background:var(--ps)}
 .tbtn.acc{background:var(--ac);color:#fff;border-color:var(--ac)}
-.lrow{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:var(--rsm);background:var(--ps);border:1px solid var(--bdl);margin-bottom:3px;flex-wrap:wrap;flex-wrap:wrap;row-gap:4px}
+.lrow{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:var(--rsm);background:var(--ps);border:1px solid var(--bdl);margin-bottom:3px;flex-wrap:wrap}
 .chkrow{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--rmd);background:var(--ps);border:1px solid var(--bdl);margin-bottom:.5rem}
 .chkrow input[type=checkbox]{width:auto;margin-top:2px;accent-color:var(--ac)}
 .search-box{position:relative;margin-bottom:8px}
@@ -302,8 +305,8 @@ button:hover{background:var(--ps)}
 .tut-overlay{position:absolute;inset:0;background:rgba(0,0,0,.28);pointer-events:none}
 .tut-box{position:absolute;background:var(--t1);color:var(--pc);border-radius:var(--rmd);padding:12px 14px;width:min(280px,85vw);box-shadow:0 4px 20px rgba(0,0,0,.22);pointer-events:all;font-size:12px;line-height:1.6}
 .tut-box::before{content:'';position:absolute;width:10px;height:10px;background:var(--t1);transform:rotate(45deg)}
-.tut-box.arrow-top::before{top:-5px;left:var(--arrow-left,24px)}
-.tut-box.arrow-bottom::before{bottom:-5px;left:var(--arrow-left,24px)}
+.tut-box.arrow-top::before{top:-5px;left:24px}
+.tut-box.arrow-bottom::before{bottom:-5px;left:24px}
 .tut-title{font-size:13px;font-weight:700;margin-bottom:5px}
 .tut-step-label{font-size:10px;opacity:.65;margin-bottom:6px}
 .tut-actions{display:flex;gap:7px;margin-top:10px;justify-content:flex-end;align-items:center}
@@ -435,7 +438,7 @@ button:hover{background:var(--ps)}
 
 </style>
 
-  <link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Inventario+Tarmed%22%2C%22short_name%22%3A%22Tarmed%22%2C%22start_url%22%3A%22%2FInventario-de-medicamentos%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2318302A%22%2C%22theme_color%22%3A%22%2318302A%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fsantiagojrexach-alt.github.io%2FInventario-de-medicamentos%2Ftarmed-icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fsantiagojrexach-alt.github.io%2FInventario-de-medicamentos%2Ftarmed-icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
+  <link rel="manifest" href="data:application/json,%7B%0A++++%22name%22%3A%22Inventario+Tarmed%22%2C%0A++++%22short_name%22%3A%22Tarmed%22%2C%0A++++%22start_url%22%3A%22%2FInventario-de-medicamentos%2F%22%2C%0A++++%22display%22%3A%22standalone%22%2C%0A++++%22background_color%22%3A%22%2318302A%22%2C%0A++++%22theme_color%22%3A%22%2318302A%22%2C%0A++++%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg+xml%2C%3Csvg+xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27+viewBox%3D%270+0+100+100%27%3E%3Crect+width%3D%27100%27+height%3D%27100%27+rx%3D%2720%27+fill%3D%27%2318302A%27%2F%3E%3Ctext+y%3D%27.9em%27+font-size%3D%2780%27+x%3D%2710%27%3E%F0%9F%92%8A%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg+xml%22%7D%5D%0A++%7D">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -528,6 +531,7 @@ button:hover{background:var(--ps)}
     <button class="tab-sm" id="tab-btn-vencimientos" onclick="sTab('vencimientos')">📅 Vencimientos</button>
     <button class="tab-sm" id="tab-btn-analisis" onclick="sTab('analisis')">📊 Análisis</button>
     <button class="tab-sm" id="tab-btn-agregar" onclick="sTab('agregar')" title="Agregar medicamentos nuevos o recibir lotes de otro laboratorio">➕ Agregar / Recibir</button>
+    <button class="tab-sm" id="tab-btn-pacientes" onclick="sTab('pacientes')" title="Pacientes y planes farmacológicos">🧑‍⚕️ Pacientes</button>
     <button class="cfg-btn" id="tab-btn-config" onclick="sTab('config')" title="Configuración" aria-label="Configuración">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -876,6 +880,34 @@ button:hover{background:var(--ps)}
 </div>
 
 <!-- CONFIG -->
+<div class="panel" id="tab-pacientes">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div class="sec" style="margin:0">🧑‍⚕️ Mis pacientes</div>
+      <button onclick="abrirFormPaciente()" class="btn-primary" style="font-size:12px;padding:6px 14px">+ Agregar paciente</button>
+    </div>
+    <div id="pac-cobertura-banner"></div>
+    <div id="pac-lista"></div>
+  </div>
+  <!-- Modal agregar/editar paciente -->
+  <div id="pac-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
+    <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:480px;margin:40px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+      <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="pac-modal-title">Nuevo paciente</div>
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nombre / Identificación</label>
+      <input id="pac-nombre" class="inp" placeholder="Ej: G. Di Giulio" style="width:100%;margin-bottom:10px;box-sizing:border-box">
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Notas (diagnóstico, observaciones)</label>
+      <input id="pac-notas" class="inp" placeholder="Opcional" style="width:100%;margin-bottom:14px;box-sizing:border-box">
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px">Plan farmacológico</div>
+      <div id="pac-plan-lista"></div>
+      <button onclick="pacAgregarMed()" class="btn-ghost" style="font-size:12px;margin-top:6px;margin-bottom:14px">+ Agregar medicamento al plan</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="cerrarFormPaciente()" class="btn-ghost">Cancelar</button>
+        <button onclick="guardarPaciente()" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="tab-config">
   <div class="card">
     <div class="sec">Tema visual</div>
@@ -999,7 +1031,6 @@ button:hover{background:var(--ps)}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
-
 
 
 
@@ -1547,8 +1578,8 @@ let GROUPS=Object.assign({},BASE_GROUPS);
 const EXTRA_BADGE_COLORS=[['b-blue','#2E7DBD'],['b-teal','#1A9070'],['b-amber','#C88A18'],['b-purple','#6850C0'],['b-gray','#5A7060'],['b-acc','#2E7A44'],['b-red-s','#C04040'],['b-green','#1A6020']];
 function getOrAddGroup(name){if(!name)return'Compuestos Z / Otros';if(GROUPS[name])return name;const idx=Object.keys(GROUPS).length%EXTRA_BADGE_COLORS.length;const[badge,color]=EXTRA_BADGE_COLORS[idx];GROUPS[name]={badge,color};return name;}
 const LCOLS=['#2E7DBD','#1A9070','#C88A18','#6850C0','#C05050','#5A7060','#A0608A','#3090A8'];
-const STORE_KEY='tarmed_v52';
-const APP_VERSION='v52';
+const STORE_KEY='tarmed_v52'; // misma key para mantener datos existentes
+const APP_VERSION='v53';
 const THEMES=[
   {name:'Verde salvia',cls:'',bg:'#EEF5EE',accent:'#2E7A44'},
   {name:'Lavanda',cls:'th-lavanda',bg:'#F2EEF8',accent:'#6840B8'},
@@ -1662,6 +1693,7 @@ let auditLog = [];
 // Aliases para compatibilidad — todas las funciones usan estas vars directamente
 // STORE es la fuente de verdad para serialización/deserialización
 let { inventory, historial, retiros, cfg, pedidoLines, darkMode, themeIdx, activeTab } = STORE;
+let pacientes = []; // array de pacientes con planes farmacológicos
 let activeFilter='Todos',editingCtx=null,venFilter='Todos';
 let editCollapsed={},invCollapsed={},venCollapsed={}; // grupos colapsados por sección
 let invViewMode='detail'; // 'detail' | 'quick'
@@ -1720,6 +1752,8 @@ function applyStateFromJSON(s, opts = {}) {
     if (l.ven === undefined) l.ven = '';
     if (l.min === undefined) l.min = 0;
   }));
+  // Restaurar pacientes
+  pacientes = s.pacientes || [];
   // Restaurar grupos personalizados
   if (s.customGroups) {
     Object.entries(s.customGroups).forEach(([k, v]) => { if (!GROUPS[k]) GROUPS[k] = v; });
@@ -1736,7 +1770,7 @@ function getStorePayload() {
   const pLines = pedidoLines.map(({ lineId, ...rest }) => rest);
   const customGroups = {};
   Object.entries(GROUPS).forEach(([k, v]) => { if (!BASE_GROUPS[k]) customGroups[k] = v; });
-  return { inventory, historial, retiros, auditLog, cfg, darkMode, pedidoLines: pLines, activeTab, customGroups };
+  return { inventory, historial, retiros, auditLog, cfg, darkMode, pedidoLines: pLines, activeTab, customGroups, pacientes };
 }
 let lineCounter=0,VEN_ALERT_DAYS=180,venSort='group',undoRetiro=null;
 function newLineId(){return ++lineCounter;}
@@ -2029,8 +2063,15 @@ function normDate(s){if(!s||!s.trim())return '';const p=s.trim().split('/');if(p
 function daysToVen(s){const d=parseVenDate(s);if(!d)return null;d.setMonth(d.getMonth()+1);d.setDate(0);return Math.round((d-new Date())/864e5);}
 function venChipClass(days){return days===null?'':days<0?'venc':days<=VEN_ALERT_DAYS?'prox':'';}
 function totalStock(m){return m.lots.reduce((s,l)=>s+l.qty,0);}
+// Comprimidos sueltos: devuelve total de comp. sueltos de un med en todos sus doses
+function totalLooseComps(m){if(!m.looseComps)return 0;return Object.values(m.looseComps).reduce((s,v)=>s+(v||0),0);}
+// Comprimidos sueltos para una dosis específica
+function looseCompsForDose(m,dose){if(!m.looseComps)return 0;return m.looseComps[String(dose)]||0;}
+// Stock total en comprimidos (cajas × comp/caja + sueltos)
+function totalCompsStock(m,dose){const lots=m.lots.filter(l=>l.dose===dose);const cajasComps=lots.reduce((s,l)=>s+(l.qty||0)*(l.comps||30),0);const sueltos=looseCompsForDose(m,dose);return cajasComps+sueltos;}
 function stockClass(q,mn){return q===0&&mn===0?'sok':q===0&&mn>0?'scrit':mn>0&&q<=mn?'slow':'sok';}
-function getAllLotVen(){const res=[];inventory.forEach(m=>m.lots.forEach(l=>{if(!l.ven)return;res.push({name:m.name,group:m.group,dose:l.dose,lab:l.lab,ven:l.ven,days:daysToVen(l.ven),qty:l.qty});}));return res.sort((a,b)=>(a.days??9999)-(b.days??9999));}
+function getAllLotVen(){const res=[];inventory.forEach(m=>m.lots.forEach(l=>{if(!l.ven)return;if((l.qty||0)<=0)return;// no alertar lotes ya dispensados/vacíos
+res.push({name:m.name,group:m.group,dose:l.dose,lab:l.lab,ven:l.ven,days:daysToVen(l.ven),qty:l.qty});}));return res.sort((a,b)=>(a.days??9999)-(b.days??9999));}
 // TARMED
 
 // ── Colores de vencimiento (fuente única) ─────────────────────────
@@ -2184,7 +2225,7 @@ function renderConfigPreview() {
 // NAV
 // ══ NAVEGACIÓN ═══════════════════════════════════════════
 const PRIMARY_TABS=['resumen','inventario','pedido','dispensacion'];
-const SECONDARY_TABS=['analisis','vencimientos','agregar','config'];
+const SECONDARY_TABS=['analisis','vencimientos','agregar','pacientes','config'];
 function sTab(name) {
   // Registrar historial de navegación (no duplicar si es el mismo tab)
   if (activeTab && activeTab !== name) {
@@ -2217,8 +2258,9 @@ function sTab(name) {
 
   if (name === 'vencimientos')  renderVencimientos();
   if (name === 'agregar')       renderEditList();
+  if (name === 'pacientes')     renderPacientes();
   if (name === 'config')        { renderConfigPreview(); syncConfigUI(); buildThemeSwatches(); renderShortcutsTable(); }
-  
+
 }
 function renderAll() {
   renderResumen();
@@ -2735,6 +2777,18 @@ function prefillarAgregar(name, group) {
   setTimeout(() => nameEl?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
   showToast(`➕ Completá los datos del nuevo lote de ${name}`);
 }
+function buildLooseCompsHTML(m, realIdx) {
+  // Muestra comprimidos sueltos agrupados por dosis
+  const doses = [...new Set(m.lots.map(l => l.dose))].sort((a,b)=>a-b);
+  const parts = doses.map(dose => {
+    const sc = looseCompsForDose(m, dose);
+    const cajasComps = m.lots.filter(l=>l.dose===dose).reduce((s,l)=>s+(l.qty||0)*(l.comps||30),0);
+    const badge = sc > 0 ? `<span style="background:var(--acl);color:var(--ac);border-radius:3px;padding:1px 5px;font-weight:600;font-size:10px;cursor:pointer" onclick="editLooseComps(${realIdx},${dose})" title="Editar comp. sueltos">${dose}mg: +${sc} sueltos</span>` : `<span style="color:var(--tm);font-size:10px;cursor:pointer;opacity:0.7" onclick="editLooseComps(${realIdx},${dose})" title="Agregar comp. sueltos de ${dose}mg">+comp. sueltos</span>`;
+    return badge;
+  }).join(' ');
+  return `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">${parts}</div>`;
+}
+
 function buildMedRowHTML(m, realIdx) {
   const tot      = totalStock(m);
   const urg      = medUrgency(m);
@@ -2742,6 +2796,7 @@ function buildMedRowHTML(m, realIdx) {
   const chips    = m.lots.map((l, li) => buildLotChipHTML(l, realIdx, li)).join('');
   const totMin   = m.lots.reduce((s, l) => s + l.min, 0);
   const obsHTML  = m.obs ? `<div style="font-size:10px;color:var(--tm);margin-top:3px;font-style:italic">📝 ${m.obs}</div>` : '';
+  const looseHTML = buildLooseCompsHTML(m, realIdx);
   return `
     <div class="inv-med-row">
       <div class="inv-urg-bar" style="background:${urgColor}"></div>
@@ -2752,6 +2807,7 @@ function buildMedRowHTML(m, realIdx) {
           <button onclick="prefillarAgregar('${m.name}','${m.group}')" class="btn-inline-ghost" title="Agregar lote de otro laboratorio">+ Lote</button>
         </div>
         <div class="inv-lots">${chips}</div>
+        ${looseHTML}
         ${obsHTML}
       </div>
       <span class="sp ${stockClass(tot, totMin)}" style="margin-left:8px;flex-shrink:0">${tot}</span>
@@ -2877,6 +2933,235 @@ function adjStock(mi, li, delta) {
     chip.classList.add(cls);
     chip.addEventListener('animationend', () => chip.classList.remove(cls), { once: true });
   });
+}
+
+function editLooseComps(mi, dose) {
+  const m = inventory[mi];
+  if (!m) return;
+  if (!m.looseComps) m.looseComps = {};
+  const current = m.looseComps[String(dose)] || 0;
+  const val = prompt(`Comprimidos sueltos de ${m.name} ${dose}mg\n(aparte de las cajas en stock)\nIngresá 0 para borrar:`, current);
+  if (val === null) return;
+  const n = parseInt(val, 10);
+  if (isNaN(n) || n < 0) { showToast('⚠ Ingresá un número válido.'); return; }
+  if (n === 0) delete m.looseComps[String(dose)];
+  else m.looseComps[String(dose)] = n;
+  saveState();
+  renderInventory();
+  renderResumen();
+  const lbl = n > 0 ? `✓ ${n} comp. sueltos guardados para ${m.name} ${dose}mg.` : `Comp. sueltos de ${m.name} ${dose}mg eliminados.`;
+  showToast(lbl);
+}
+
+// ══ PACIENTES ════════════════════════════════════════════════════════════════
+// Modelo: pacientes = [{id, nombre, notas, plan:[{name, dose, compsDia}]}]
+
+let _pacEditIdx = null; // índice del paciente en edición (-1 = nuevo)
+let _pacPlanTemp = [];  // plan temporal mientras está abierto el modal
+
+function pacNuevoId() {
+  return 'pac_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+}
+
+// Calcula comprimidos disponibles de un nombre+dosis sumando cajas+sueltos
+function compsDisponibles(medName, dose) {
+  const m = inventory.find(x => x.name === medName && !x.archived);
+  if (!m) return 0;
+  return totalCompsStock(m, dose);
+}
+
+// Calcula comprimidos necesarios por mes para todos los pacientes con ese med+dosis
+function compsTotalesMes(medName, dose) {
+  let total = 0;
+  pacientes.forEach(p => {
+    p.plan.forEach(item => {
+      if (item.name === medName && Number(item.dose) === Number(dose)) {
+        total += (item.compsDia || 0) * 30;
+      }
+    });
+  });
+  return total;
+}
+
+// Devuelve un array de {medName, dose, disponibles, necesarios, ok}
+function calcCoberturas() {
+  const map = {};
+  pacientes.forEach(p => {
+    p.plan.forEach(item => {
+      const key = item.name + '__' + item.dose;
+      if (!map[key]) map[key] = { medName: item.name, dose: Number(item.dose), compsDia: 0 };
+      map[key].compsDia += (item.compsDia || 0);
+    });
+  });
+  return Object.values(map).map(({ medName, dose, compsDia }) => {
+    const disponibles = compsDisponibles(medName, dose);
+    const necesarios  = compsDia * 30;
+    return { medName, dose, disponibles, necesarios, ok: disponibles >= necesarios };
+  });
+}
+
+function renderPacientes() {
+  const lista   = document.getElementById('pac-lista');
+  const banner  = document.getElementById('pac-cobertura-banner');
+  if (!lista) return;
+
+  const coberturas = calcCoberturas();
+  const sinStock   = coberturas.filter(c => !c.ok);
+
+  // Banner de alerta
+  if (sinStock.length > 0) {
+    banner.innerHTML = `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:13px">
+      ⚠️ <strong>Stock insuficiente para ${sinStock.length} medicamento(s):</strong>
+      ${sinStock.map(c => `<span style="margin-left:6px">${c.medName} ${c.dose}mg — necesitás ${c.necesarios} comp., tenés ${c.disponibles}</span>`).join('<br>')}
+    </div>`;
+  } else if (pacientes.length > 0) {
+    banner.innerHTML = `<div style="background:#d4edda;border:1px solid #28a745;border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:13px">
+      ✅ Stock suficiente para cubrir todos los pacientes este mes.
+    </div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+
+  if (pacientes.length === 0) {
+    lista.innerHTML = `<div style="text-align:center;padding:32px;color:var(--tm);font-size:13px">
+      No hay pacientes registrados.<br>
+      <span style="font-size:12px;opacity:.7">Usá el botón "+ Agregar paciente" para comenzar.</span>
+    </div>`;
+    return;
+  }
+
+  lista.innerHTML = pacientes.map((p, idx) => {
+    const planHTML = p.plan.length === 0
+      ? `<span style="color:var(--tm);font-size:12px">Sin plan farmacológico</span>`
+      : p.plan.map(item => {
+          const disp = compsDisponibles(item.name, item.dose);
+          const nec  = (item.compsDia || 0) * 30;
+          const ok   = disp >= nec;
+          const color = ok ? '#28a745' : '#dc3545';
+          const icon  = ok ? '✅' : '⚠️';
+          return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--brd);font-size:13px">
+            <span style="flex:1;font-weight:500">${item.name} ${item.dose}mg</span>
+            <span style="color:var(--tm)">${item.compsDia} comp/día</span>
+            <span style="color:${color};font-size:12px;min-width:120px;text-align:right">
+              ${icon} ${disp}/${nec} comp.
+            </span>
+          </div>`;
+        }).join('');
+
+    return `<div class="card" style="margin-bottom:10px;padding:12px 16px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-weight:700;font-size:14px">👤 ${escHtml(p.nombre)}</div>
+          ${p.notas ? `<div style="color:var(--tm);font-size:12px;margin-top:2px">${escHtml(p.notas)}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="abrirFormPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px">✏️ Editar</button>
+          <button onclick="eliminarPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px;color:#dc3545">🗑</button>
+        </div>
+      </div>
+      <div>${planHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Modal agregar/editar paciente ────────────────────────────────────────────
+
+function abrirFormPaciente(idx) {
+  _pacEditIdx = (idx !== undefined) ? idx : -1;
+  const p = _pacEditIdx >= 0 ? pacientes[_pacEditIdx] : null;
+
+  document.getElementById('pac-modal-title').textContent = p ? 'Editar paciente' : 'Nuevo paciente';
+  document.getElementById('pac-nombre').value = p ? p.nombre : '';
+  document.getElementById('pac-notas').value  = p ? (p.notas || '') : '';
+  _pacPlanTemp = p ? JSON.parse(JSON.stringify(p.plan)) : [];
+
+  renderPacPlanLista();
+  document.getElementById('pac-modal').style.display = 'block';
+}
+
+function cerrarFormPaciente() {
+  document.getElementById('pac-modal').style.display = 'none';
+  _pacEditIdx = null;
+  _pacPlanTemp = [];
+}
+
+function renderPacPlanLista() {
+  const cont = document.getElementById('pac-plan-lista');
+  if (!cont) return;
+
+  // Lista de medicamentos disponibles para el datalist
+  const medOpts = inventory
+    .filter(m => !m.archived && m.lots.length > 0)
+    .map(m => {
+      const doses = [...new Set(m.lots.map(l => l.dose))].sort((a,b)=>a-b);
+      return doses.map(d => ({ name: m.name, dose: d }));
+    }).flat();
+
+  if (_pacPlanTemp.length === 0) {
+    cont.innerHTML = `<div style="color:var(--tm);font-size:12px;margin-bottom:6px">Sin medicamentos en el plan.</div>`;
+    return;
+  }
+
+  cont.innerHTML = _pacPlanTemp.map((item, i) => `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+      <input list="pac-med-list" value="${escHtml(item.name)}" oninput="_pacPlanTemp[${i}].name=this.value"
+        class="inp" placeholder="Medicamento" style="flex:2;min-width:120px;font-size:12px">
+      <input type="number" value="${item.dose}" min="0" oninput="_pacPlanTemp[${i}].dose=+this.value"
+        class="inp" placeholder="mg" style="width:70px;font-size:12px">
+      <input type="number" value="${item.compsDia}" min="0" step="0.5" oninput="_pacPlanTemp[${i}].compsDia=+this.value"
+        class="inp" placeholder="comp/día" style="width:90px;font-size:12px">
+      <span style="color:var(--tm);font-size:11px">comp/día</span>
+      <button onclick="_pacPlanTemp.splice(${i},1);renderPacPlanLista()" class="btn-ghost" style="padding:3px 7px;font-size:12px;color:#dc3545">✕</button>
+    </div>
+  `).join('') + `<datalist id="pac-med-list">${medOpts.map(o=>`<option value="${escHtml(o.name)}">`).join('')}</datalist>`;
+}
+
+function pacAgregarMed() {
+  _pacPlanTemp.push({ name: '', dose: 0, compsDia: 1 });
+  renderPacPlanLista();
+}
+
+function guardarPaciente() {
+  const nombre = document.getElementById('pac-nombre').value.trim();
+  if (!nombre) { showToast('⚠ Ingresá un nombre o identificación.'); return; }
+
+  // Validar plan
+  for (const item of _pacPlanTemp) {
+    if (!item.name.trim()) { showToast('⚠ Completá el nombre del medicamento.'); return; }
+    if (!item.dose || item.dose <= 0) { showToast('⚠ Ingresá la dosis en mg.'); return; }
+    if (item.compsDia <= 0) { showToast('⚠ La cantidad de comp/día debe ser mayor a 0.'); return; }
+  }
+
+  const pac = {
+    id:     (_pacEditIdx >= 0 ? pacientes[_pacEditIdx].id : null) || pacNuevoId(),
+    nombre,
+    notas: document.getElementById('pac-notas').value.trim(),
+    plan:  _pacPlanTemp.map(item => ({ name: item.name.trim(), dose: Number(item.dose), compsDia: Number(item.compsDia) }))
+  };
+
+  if (_pacEditIdx >= 0) {
+    pacientes[_pacEditIdx] = pac;
+  } else {
+    pacientes.push(pac);
+  }
+
+  cerrarFormPaciente();
+  saveState();
+  renderPacientes();
+  showToast(_pacEditIdx >= 0 ? `✓ Paciente "${nombre}" actualizado.` : `✓ Paciente "${nombre}" agregado.`);
+}
+
+function eliminarPaciente(idx) {
+  const nombre = pacientes[idx]?.nombre || 'este paciente';
+  if (!confirm(`¿Eliminar a "${nombre}" del registro?`)) return;
+  pacientes.splice(idx, 1);
+  saveState();
+  renderPacientes();
+  showToast(`Paciente eliminado.`);
 }
 
 function getMedObs(name) {
@@ -4276,37 +4561,33 @@ function buildLotRowHTML(l, mi, li) {
          onchange="inventory[${mi}].lots[${li}].lab=this.value;saveState()">` : '';
   return `
     <div class="lrow">
-      <div style="display:flex;align-items:center;gap:4px;width:100%;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--t2);min-width:32px;flex-shrink:0;font-weight:600">${l.dose}mg</span>
-        <select style="flex:1;min-width:90px;max-width:120px;font-size:11px"
-          onchange="updLotLab(${mi},${li},this.value)">
-          <option value="" ${!l.lab?'selected':''}>— sin lab —</option>
-          ${LABS.map(lb => `<option value="${lb}" ${l.lab===lb?'selected':''}>${lb}</option>`).join('')}
-          <option value="__otro__" ${l.lab&&!LABS.includes(l.lab)?'selected':''}>Otro...</option>
-        </select>
-        ${customLabInput}
-        <input type="text" value="${l.ven||''}" placeholder="venc"
-          style="width:58px;font-size:11px;border-color:${borderColor}"
-          oninput="fmtDateFlex(this)" onchange="updLotVen(${mi},${li},this.value)">
-        <span style="font-size:10px;color:var(--tm);flex-shrink:0">caj:</span>
-        <input type="number" value="${l.qty}" min="0" style="width:40px;font-size:11px"
-          onchange="inventory[${mi}].lots[${li}].qty=Math.max(0,parseInt(this.value)||0);saveState();renderResumen();renderInventory()">
-        <span style="font-size:10px;color:var(--tm);flex-shrink:0">mín:</span>
-        <input type="number" value="${l.min}" min="0" style="width:34px;font-size:11px"
-          onchange="inventory[${mi}].lots[${li}].min=Math.max(0,parseInt(this.value)||0);saveState();renderResumen()">
-        <select style="width:48px;font-size:11px"
-          onchange="inventory[${mi}].lots[${li}].comps=parseInt(this.value)||0;saveState()">
-          <option value="0" ${!l.comps?'selected':''}>cp—</option>
-          ${COMPS_OPTS.map(c => `<option value="${c}" ${l.comps===c?'selected':''}>${c}</option>`).join('')}
-        </select>
-        <input type="text" value="${l.notes||''}" placeholder="📝" style="width:60px;font-size:11px"
-          onchange="inventory[${mi}].lots[${li}].notes=this.value;saveState()">
-        <div style="display:flex;gap:2px;margin-left:auto;flex-shrink:0">
-          <button class="dupbtn" onclick="openLotModal(${mi},${li})" title="Editar lote en modal">✏️</button>
-          <button class="dupbtn" onclick="dupLot(${mi},${li})" title="Duplicar lote">📋</button>
-          <button class="delbtn" onclick="remLot(${mi},${li})" title="Eliminar lote">×</button>
-        </div>
-      </div>
+      <span style="font-size:11px;color:var(--t2);min-width:32px;flex-shrink:0">${l.dose}mg</span>
+      <select style="width:110px;font-size:11px;flex-shrink:0"
+        onchange="updLotLab(${mi},${li},this.value)">
+        <option value="" ${!l.lab?'selected':''}>— sin lab —</option>
+        ${LABS.map(lb => `<option value="${lb}" ${l.lab===lb?'selected':''}>${lb}</option>`).join('')}
+        <option value="__otro__" ${l.lab&&!LABS.includes(l.lab)?'selected':''}>Otro...</option>
+      </select>
+      ${customLabInput}
+      <input type="text" value="${l.ven||''}" placeholder="venc"
+        style="width:60px;font-size:11px;border-color:${borderColor}"
+        oninput="fmtDateFlex(this)" onchange="updLotVen(${mi},${li},this.value)">
+      <span style="font-size:10px;color:var(--tm);flex-shrink:0">caj:</span>
+      <input type="number" value="${l.qty}" min="0" style="width:42px;font-size:11px"
+        onchange="inventory[${mi}].lots[${li}].qty=Math.max(0,parseInt(this.value)||0);saveState();renderResumen();renderInventory()">
+      <span style="font-size:10px;color:var(--tm);flex-shrink:0">mín:</span>
+      <input type="number" value="${l.min}" min="0" style="width:34px;font-size:11px"
+        onchange="inventory[${mi}].lots[${li}].min=Math.max(0,parseInt(this.value)||0);saveState();renderResumen()">
+      <select style="width:50px;font-size:11px"
+        onchange="inventory[${mi}].lots[${li}].comps=parseInt(this.value)||0;saveState()">
+        <option value="0" ${!l.comps?'selected':''}>cp—</option>
+        ${COMPS_OPTS.map(c => `<option value="${c}" ${l.comps===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <input type="text" value="${l.notes||''}" placeholder="📝" style="width:66px;font-size:11px"
+        onchange="inventory[${mi}].lots[${li}].notes=this.value;saveState()">
+      <button class="dupbtn" onclick="openLotModal(${mi},${li})" title="Editar lote en modal">✏️</button>
+      <button class="dupbtn" onclick="dupLot(${mi},${li})" title="Duplicar lote">📋</button>
+      <button class="delbtn" onclick="remLot(${mi},${li})" title="Eliminar lote">×</button>
     </div>`;
 }
 function buildMedSectionHTML(m, mi) {
@@ -4583,41 +4864,28 @@ function obFinish() {
 function remLot(mi,li){
   const m=inventory[mi];if(!m)return;
   const l=m.lots[li];if(!l)return;
-  const label=`${m.name} ${l.dose}mg${l.lab?' · '+l.lab:''}${l.ven?' · v.'+l.ven:''}`;
-  showConfirm(
-    'Eliminar lote',
-    `¿Eliminás el lote ${label}? Podés deshacer durante 5 segundos.`,
-    () => {
-      const lotCopy=JSON.parse(JSON.stringify(l));
-      m.lots.splice(li,1);
-      if(!m.lots.length)inventory.splice(mi,1);
-      saveState();renderEditList();renderResumen();renderInventory();renderVencimientos();
-      showToast(`🗑 Lote eliminado: ${label}`,()=>{
-        const target=inventory.find(x=>x.name===(m.name));
-        if(target){target.lots.splice(li,0,lotCopy);target.lots.sort((a,b)=>a.dose-b.dose);}
-        else{inventory.push({name:m.name,group:m.group,lots:[lotCopy]});inventory.sort((a,b)=>a.name.localeCompare(b.name));}
-        saveState();renderEditList();renderResumen();renderInventory();renderVencimientos();
-        showToast('↩ Lote restaurado');
-      },5000);
-    },
-    'Eliminar', true
-  );
+  const label=`${m.name} ${l.dose}mg${l.lab?' ('+l.lab+')':''}`;
+  const lotCopy=JSON.parse(JSON.stringify(l));
+  m.lots.splice(li,1);
+  if(!m.lots.length)inventory.splice(mi,1);
+  saveState();renderEditList();renderResumen();renderInventory();renderVencimientos();
+  showToast(`🗑 Lote eliminado: ${label}`,()=>{
+    // UNDO: re-insert
+    const target=inventory.find(x=>x.name===(m.name));
+    if(target){target.lots.splice(li,0,lotCopy);target.lots.sort((a,b)=>a.dose-b.dose);}
+    else{inventory.push({name:m.name,group:m.group,lots:[lotCopy]});inventory.sort((a,b)=>a.name.localeCompare(b.name));}
+    saveState();renderEditList();renderResumen();renderInventory();renderVencimientos();
+    showToast('↩ Lote restaurado');
+  },5000);
 }
 // adjStock: ver definición canónica arriba
 // ── DUPLICAR LOTE ─────────────────────────────────────────────
 function dupLot(mi,li){
   const m=inventory[mi];const l=m?.lots[li];if(!m||!l)return;
-  showConfirm(
-    'Duplicar lote',
-    `Se crea una copia de ${m.name} ${l.dose}mg${l.lab?' · '+l.lab:''} con stock 1 y sin vencimiento. Recordá actualizar el vencimiento.`,
-    () => {
-      const copy=Object.assign({},l,{ven:'',qty:1,notes:''});
-      m.lots.splice(li+1,0,copy);
-      saveState();renderEditList();
-      showToast(`📋 Lote duplicado: ${m.name} ${l.dose}mg. Actualizá el vencimiento.`);
-    },
-    'Duplicar', false
-  );
+  const copy=Object.assign({},l,{ven:'',qty:1,notes:''});
+  m.lots.splice(li+1,0,copy);
+  saveState();renderEditList();
+  showToast(`📋 Lote duplicado: ${m.name} ${l.dose}mg. Actualizá el vencimiento.`);
 }
 // ── PROYECCIÓN DE STOCK ───────────────────────────────────────
 
@@ -4710,11 +4978,11 @@ function exportClean(){
 
 // ── TUTORIAL INTERACTIVO ──────────────────────────────────────
 const TUT_STEPS=[
-  {tab:'resumen',    title:'Inicio',               arrow:'arrow-top',  anchorId:'tab-btn-resumen',    body:'Tu centro de control. Muestra el stock total, alertas de medicamentos bajos o vencidos, y la proyección de cuánto te queda de cada uno según el consumo histórico.'},
+  {tab:'resumen',    title:'Panel de Resumen',     arrow:'arrow-top',  anchorId:'tab-btn-resumen',    body:'Tu centro de control. Muestra el stock total, alertas de medicamentos bajos o vencidos, y la proyección de cuánto te queda de cada uno según el consumo histórico.'},
   {tab:'inventario', title:'Inventario',            arrow:'arrow-top',  anchorId:'tab-btn-inventario', body:'Todos tus lotes ordenados por urgencia. Usá los botones − y + en cada chip para ajustar el stock rápido, o el botón <strong>Disp.</strong> para registrar una dispensación al instante.'},
-  {tab:'dispensacion',title:'Dispensación',        arrow:'arrow-top',  anchorId:'tab-btn-dispensacion',body:'Registrá cada medicamento que sale al paciente. Escribí el nombre (autocompleta), elegí el lote, anotá la cama o paciente y confirmá. El stock se descuenta automáticamente con opción de deshacer.'},
+  {tab:'dispensacion',title:'Dispensación',         arrow:'arrow-top',  anchorId:'tab-btn-dispensacion',body:'Registrá cada medicamento que sale al paciente. Escribí el nombre (autocompleta), elegí el lote, anotá la cama o paciente y confirmá. El stock se descuenta automáticamente con opción de deshacer.'},
   {tab:'pedido',     title:'Pedido a Tarmed',       arrow:'arrow-top',  anchorId:'tab-btn-pedido',     body:'Armá el pedido mensual: máx. 10 cajas totales, máx. 3 por laboratorio. Los medicamentos con déficit aparecen primero en naranja. Usá <strong>✦ Auto</strong> para que la app complete el pedido automáticamente.'},
-  {tab:'vencimientos',title:'Vencimientos',        arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
+  {tab:'vencimientos',title:'Vencimientos',         arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
   {tab:'agregar',    title:'Agregar medicamento',   arrow:'arrow-top',  anchorId:'tab-btn-agregar',    body:'Sumá lotes nuevos al inventario. Si el medicamento ya existe, el lote nuevo se agrega sin duplicar. Podés duplicar un lote existente con el botón 📋 para cambiar solo el vencimiento.'},
   {tab:'config',     title:'Configuración',         arrow:'arrow-top',  anchorId:'tab-btn-config',     body:'Configurá tu ID: Institución, Servicio y Profesional. También ajustá el día de retiro en Tarmed, los días de alerta de vencimiento, el tamaño de texto y exportá un backup JSON.'},
 ];
@@ -4743,42 +5011,37 @@ function positionTutBox() {
   const anchor = document.getElementById(step.anchorId);
   const box    = document.getElementById('tut-box');
   if (!box) return;
+  // El tut-box es position:fixed — las coords son relativas al viewport,
+  // igual que getBoundingClientRect(). NO sumar scrollY.
+  // Scroll al top para que el nav siempre sea visible al calcular posición.
   window.scrollTo({ top: 0, behavior: 'instant' });
-  const vw    = window.innerWidth;
-  const vh    = window.innerHeight;
-  const boxW  = Math.min(280, vw * 0.85);
-  const boxH  = box.offsetHeight || 180;
-  let top = 80, left = 20, arrow = 'arrow-top', arrowLeft = 24;
-
+  const vw   = window.innerWidth;
+  const boxW = Math.min(280, vw * 0.85);
+  let top = 80, left = 20;
   if (anchor) {
     const r = anchor.getBoundingClientRect();
-    const anchorCX = r.left + r.width / 2;
-    // Centrar el box sobre el anchor
-    left = anchorCX - boxW / 2;
-    left = Math.max(8, Math.min(left, vw - boxW - 8));
-    // Flecha apunta al centro del anchor
-    arrowLeft = Math.round(anchorCX - left - 8);
-    arrowLeft = Math.max(10, Math.min(arrowLeft, boxW - 26));
-    // Vertical
-    if (r.bottom + 12 + boxH < vh - 20) {
-      top = r.bottom + 12; arrow = 'arrow-top';
-    } else {
-      top = r.top - boxH - 18; arrow = 'arrow-bottom';
-    }
+    left = r.left - 4;
+    top  = step.arrow === 'arrow-top'
+      ? r.bottom + 12
+      : r.top - box.offsetHeight - 18;
   }
-
-  box.className = 'tut-box ' + arrow;
-  box.style.setProperty('--arrow-left', arrowLeft + 'px');
+  // Clampear para que no se salga del viewport
   top  = Math.max(8, top);
+  left = Math.max(8, Math.min(left, vw - boxW - 12));
   box.style.top   = top  + 'px';
   box.style.left  = left + 'px';
   box.style.width = boxW + 'px';
 }
 // tutSwitchTab: cambia el panel sin efectos secundarios de sTab()
 function tutSwitchTab(name) {
-  // Llamar sTab directamente para cambiar el panel correctamente
-  sTab(name);
-  // Scroll al botón del tab para que sea visible
+  [...document.querySelectorAll('.tab-btn')].forEach(b => {
+    b.classList.toggle('active', b.id === 'tab-btn-' + name);
+  });
+  const cfgBtn = document.getElementById('tab-btn-config');
+  if (cfgBtn) cfgBtn.classList.toggle('active', name === 'config');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
   const btn = document.getElementById('tab-btn-' + name);
   if (btn) btn.scrollIntoView({ block:'nearest', inline:'center', behavior:'instant' });
 }
@@ -5143,7 +5406,6 @@ function loadMoreRetiros() {
   renderRetiros(false);
 }
 </script>
-
 
 
 
