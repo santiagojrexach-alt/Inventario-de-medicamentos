@@ -911,6 +911,25 @@ button:hover{background:var(--ps)}
   </div>
 </div>
 
+<!-- Modal: agregar comp. sueltos sin caja -->
+<div id="loose-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
+  <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:420px;margin:60px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+    <div style="font-weight:700;font-size:15px;margin-bottom:14px">Comprimidos sueltos sin caja</div>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Medicamento</label>
+    <input id="loose-med-input" class="inp" list="loose-med-list" placeholder="Escribí el nombre del medicamento…" style="width:100%;margin-bottom:10px;box-sizing:border-box" oninput="looseMedInputChanged()">
+    <datalist id="loose-med-list"></datalist>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Dosis (mg)</label>
+    <input id="loose-dose-input" class="inp" type="number" min="0" step="any" placeholder="Ej: 10" style="width:100%;margin-bottom:10px;box-sizing:border-box" oninput="looseMedInputChanged()">
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Cantidad de comprimidos sueltos</label>
+    <input id="loose-qty-input" class="inp" type="number" min="0" step="1" placeholder="Ej: 30" style="width:100%;margin-bottom:6px;box-sizing:border-box">
+    <div id="loose-current-hint" style="font-size:11px;color:var(--tm);margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="cerrarLooseModal()" class="btn-ghost">Cancelar</button>
+      <button onclick="guardarLooseSinCaja()" class="btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="tab-config">
   <div class="card">
     <div class="sec">Tema visual</div>
@@ -1952,11 +1971,16 @@ function buildPrintRow(m, l, isFirst) {
   const vs = days !== null && days < 0
     ? 'color:#891E1E;font-weight:bold'
     : days !== null && days <= VEN_ALERT_DAYS ? 'color:#7A4808' : '';
+  const sc = looseCompsForDose(m, l.dose);
+  const looseCell = sc > 0
+    ? `<span style="background:#e8f5e9;color:#1A5430;font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px">+${sc}</span>`
+    : '—';
   return `<tr>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:${isFirst?600:400}">${isFirst?m.name:''}</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center">${l.dose}mg</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center">${l.comps||'—'}</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center;font-weight:bold">${l.qty}</td>
+    <td style="padding:5px 10px;border-bottom:1px solid #ddd;text-align:center">${looseCell}</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd">${l.lab||'—'}</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;${vs}">${l.ven?normDate(l.ven):'—'}</td>
     <td style="padding:5px 10px;border-bottom:1px solid #ddd;font-size:11px;color:#555">${l.notes||''}</td>
@@ -1967,27 +1991,44 @@ function buildPrintRows() {
   Object.keys(GROUPS).forEach(g => {
     const meds = inventory.filter(m => m.group === g);
     if (!meds.length) return;
-    rows += `<tr><td colspan="7" style="background:#2A7A52;color:#fff;font-weight:bold;padding:6px 10px">${g}</td></tr>`;
+    rows += `<tr><td colspan="8" style="background:#2A7A52;color:#fff;font-weight:bold;padding:6px 10px">${g}</td></tr>`;
     meds.forEach(m => {
       m.lots.forEach((l, i) => { rows += buildPrintRow(m, l, i === 0); });
     });
   });
   return rows;
 }
+function buildPrintLooseRows() {
+  // Loose comps for meds that have NO boxed lots (only looseComps entries)
+  const rows = [];
+  inventory.filter(m => !m.archived).forEach(m => {
+    if (!m.looseComps) return;
+    const lotDoses = new Set(m.lots.map(l => String(l.dose)));
+    Object.entries(m.looseComps).forEach(([doseStr, qty]) => {
+      if (!lotDoses.has(doseStr) && qty > 0) {
+        rows.push(`<tr style="background:#f0f8f0"><td>${m.name}</td><td>${doseStr}mg</td><td>—</td><td>—</td><td style="color:#1A5430;font-weight:600">+${qty}</td><td colspan="3" style="color:#555;font-size:11px">Sin caja registrada</td></tr>`);
+      }
+    });
+  });
+  return rows.join('');
+}
 function printInventario() {
   const d   = new Date().toLocaleDateString('es-AR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const hdr = cfg.name ? `<p style="color:#555;font-size:12px">${cfg.name}</p>` : '';
   const total = inventory.reduce((s, m) => s + totalStock(m), 0);
   const rows  = buildPrintRows();
+  const looseOnlyRows = buildPrintLooseRows();
   const win   = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>Inventario Tarmed v40</title>
+  win.document.write(`<!DOCTYPE html><html><head><title>Inventario Tarmed</title>
     <style>body{font-family:Arial;padding:32px;font-size:13px}h2{color:#18302A;margin-bottom:4px}
     table{width:100%;border-collapse:collapse}th{background:#18302A;color:#fff;padding:7px 10px;text-align:left;font-size:12px}
-    td{font-size:12px}@media print{body{padding:16px}}</style></head><body>
+    td{padding:5px 8px;border-bottom:1px solid #eee;font-size:12px}
+    .loose-badge{background:#e8f5e9;color:#1A5430;font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:4px}
+    @media print{body{padding:16px}}</style></head><body>
     <h2>Inventario de Psicofármacos — Tarmed</h2>${hdr}
     <p style="color:#555;font-size:12px;margin-bottom:16px">${d} · ${total} cajas totales</p>
     <table><tr><th>Medicamento</th><th>Dosis</th><th>Cp/cj</th><th>Cajas</th>
-    <th>Laboratorio</th><th>Vencimiento</th><th>Notas</th></tr>${rows}</table>
+    <th>Comp. sueltos</th><th>Laboratorio</th><th>Vencimiento</th><th>Notas</th></tr>${rows}${looseOnlyRows}</table>
   </body></html>`);
   win.document.close();
   win.print();
@@ -2948,30 +2989,51 @@ function adjStock(mi, li, delta) {
 
 // Agregar comprimidos sueltos a un medicamento aunque no tenga cajas registradas
 function agregarLooseSinCaja() {
-  const nombre = prompt('Nombre del medicamento (debe coincidir exactamente con el inventario):');
-  if (!nombre || !nombre.trim()) return;
-  const m = inventory.find(x => x.name.toLowerCase() === nombre.trim().toLowerCase() && !x.archived);
-  if (!m) {
-    showToast(`⚠ No encontré "${nombre.trim()}" en el inventario activo. Verificá el nombre.`);
-    return;
+  // Fill datalist with all non-archived med names
+  const dl = document.getElementById('loose-med-list');
+  dl.innerHTML = inventory.filter(m => !m.archived).map(m => `<option value="${escHtml(m.name)}">`).join('');
+  document.getElementById('loose-med-input').value = '';
+  document.getElementById('loose-dose-input').value = '';
+  document.getElementById('loose-qty-input').value = '';
+  document.getElementById('loose-current-hint').textContent = '';
+  document.getElementById('loose-modal').style.display = 'block';
+  setTimeout(() => document.getElementById('loose-med-input').focus(), 80);
+}
+function looseMedInputChanged() {
+  const name = document.getElementById('loose-med-input').value.trim();
+  const dose = parseFloat(document.getElementById('loose-dose-input').value);
+  const hint = document.getElementById('loose-current-hint');
+  const m = inventory.find(x => x.name.toLowerCase() === name.toLowerCase() && !x.archived);
+  if (m && !isNaN(dose) && dose > 0) {
+    const cur = (m.looseComps || {})[String(dose)] || 0;
+    hint.textContent = cur > 0 ? `Actual: ${cur} comp. sueltos de ${dose}mg` : `Sin comp. sueltos registrados para ${dose}mg`;
+    document.getElementById('loose-qty-input').value = cur || '';
+  } else {
+    hint.textContent = '';
   }
-  const mi = inventory.indexOf(m);
-  const doseStr = prompt(`Dosis en mg para ${m.name}:`);
-  if (doseStr === null) return;
-  const dose = parseFloat(doseStr);
-  if (isNaN(dose) || dose <= 0) { showToast('⚠ Dosis inválida.'); return; }
-  const current = (m.looseComps || {})[String(dose)] || 0;
-  const valStr = prompt(`Comprimidos sueltos de ${m.name} ${dose}mg (actual: ${current}):`, current);
-  if (valStr === null) return;
-  const n = parseInt(valStr, 10);
-  if (isNaN(n) || n < 0) { showToast('⚠ Ingresá un número válido.'); return; }
+}
+function cerrarLooseModal() {
+  document.getElementById('loose-modal').style.display = 'none';
+}
+function guardarLooseSinCaja() {
+  const name  = document.getElementById('loose-med-input').value.trim();
+  const dose  = parseFloat(document.getElementById('loose-dose-input').value);
+  const qty   = parseInt(document.getElementById('loose-qty-input').value, 10);
+  if (!name) { showToast('⚠ Ingresá el nombre del medicamento.'); return; }
+  if (isNaN(dose) || dose <= 0) { showToast('⚠ Ingresá una dosis válida.'); return; }
+  if (isNaN(qty) || qty < 0) { showToast('⚠ Ingresá una cantidad válida (0 para eliminar).'); return; }
+  let m = inventory.find(x => x.name.toLowerCase() === name.toLowerCase() && !x.archived);
+  if (!m) {
+    // Create a new med entry with no lots, only looseComps
+    m = { name: name.trim(), group: 'Otros', lots: [], looseComps: {} };
+    inventory.push(m);
+  }
   if (!m.looseComps) m.looseComps = {};
-  if (n === 0) delete m.looseComps[String(dose)];
-  else m.looseComps[String(dose)] = n;
-  saveState();
-  renderInventory();
-  renderResumen();
-  showToast(n > 0 ? `✓ ${n} comp. sueltos de ${m.name} ${dose}mg guardados.` : `Comp. sueltos eliminados.`);
+  if (qty === 0) delete m.looseComps[String(dose)];
+  else m.looseComps[String(dose)] = qty;
+  saveState(); renderInventory(); renderResumen();
+  cerrarLooseModal();
+  showToast(qty > 0 ? `✓ ${qty} comp. sueltos de ${name} ${dose}mg guardados.` : `Comp. sueltos eliminados.`);
 }
 
 function deleteLot(mi, li) {
@@ -5181,7 +5243,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     const cm=document.getElementById('confirm-modal');
     if(cm&&cm.style.display==='block'){closeConfirm();return;}
-    const modals=['qd-modal','recepcion-modal','lot-modal','edit-modal'];
+    const modals=['qd-modal','recepcion-modal','lot-modal','edit-modal','loose-modal','pac-modal'];
     for(const id of modals){
       const el=document.getElementById(id);
       if(el&&el.style.display==='block'){
