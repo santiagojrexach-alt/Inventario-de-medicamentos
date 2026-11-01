@@ -911,6 +911,24 @@ button:hover{background:var(--ps)}
   </div>
 </div>
 
+<!-- Modal: editar turno de paciente -->
+<div id="turno-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
+  <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:360px;margin:80px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+    <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="turno-modal-title">Próximo turno</div>
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Fecha</label>
+    <input id="turno-fecha-inp" class="inp" type="date" style="width:100%;margin-bottom:10px;box-sizing:border-box">
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Hora (opcional)</label>
+    <input id="turno-hora-inp" class="inp" type="time" style="width:100%;margin-bottom:14px;box-sizing:border-box">
+    <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
+      <button id="turno-borrar-btn" onclick="borrarTurno()" class="btn-ghost" style="font-size:12px;color:var(--rt);display:none">🗑 Borrar turno</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="cerrarTurnoModal()" class="btn-ghost">Cancelar</button>
+        <button onclick="guardarTurno()" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: agregar comp. sueltos sin caja -->
 <div id="loose-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
   <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:420px;margin:60px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
@@ -1556,8 +1574,11 @@ async function initApp() {
   console.log('[Tarmed] Supabase inicializado, verificando sesión...');
   setLoadingMsg('Verificando sesión...');
   try {
-    const { data: { session }, error } = await supaClient.auth.getSession();
-    console.log('[Tarmed] getSession resultado — session:', !!session, 'error:', error);
+    const result = await supaClient.auth.getSession();
+    console.log('[Tarmed] getSession resultado raw:', JSON.stringify(result));
+    const session = result?.data?.session ?? null;
+    const error   = result?.error ?? null;
+    console.log('[Tarmed] getSession — session:', !!session, 'error:', error);
     if (error) throw error;
     if (session) {
       console.log('[Tarmed] Sesión activa, cargando datos...');
@@ -1569,7 +1590,17 @@ async function initApp() {
     }
   } catch(e) {
     console.error('[Tarmed] Error en initApp:', e);
-    setLoadingMsg('Error de conexión: ' + (e.message || e) + '. Verificá tu internet y recargá.');
+    // Si Supabase no responde bien, mostramos login para que el usuario pueda intentar autenticarse
+    // en lugar de quedar bloqueado en la pantalla de error
+    const msg = e?.message || String(e) || 'error desconocido';
+    if (msg.includes('badge') || msg.includes('undefined') || msg.includes('null')) {
+      // Error interno del SDK por respuesta malformada — tratamos como sin sesión
+      console.warn('[Tarmed] Error de SDK detectado, mostrando login como fallback');
+      hideLoading();
+      showAuthScreen();
+    } else {
+      setLoadingMsg('Error de conexión: ' + msg + '. Verificá tu internet y recargá.');
+    }
   }
   // Escuchar cambios de sesión (después del login/logout manual)
   supaClient.auth.onAuthStateChange(async (event, session) => {
@@ -3076,7 +3107,8 @@ function editLooseComps(mi, dose) {
 // ══ PACIENTES ════════════════════════════════════════════════════════════════
 // Modelo: pacientes = [{id, nombre, notas, plan:[{name, dose, compsDia}]}]
 
-let _pacEditIdx = null; // índice del paciente en edición (-1 = nuevo)
+let _pacEditIdx  = null; // índice del paciente en edición (-1 = nuevo)
+let _turnoEditIdx = null; // índice del paciente cuyo turno se está editando
 let _pacPlanTemp = [];  // plan temporal mientras está abierto el modal
 
 function pacNuevoId() {
@@ -3205,6 +3237,9 @@ function renderPacientes() {
           </div>`;
         }).join('');
 
+    const turno = p.proximo_turno || null;
+    const turnoHTML = buildTurnoHTML(idx, turno);
+
     return `<div class="card" style="margin-bottom:10px;padding:12px 16px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:6px">
@@ -3217,7 +3252,8 @@ function renderPacientes() {
             ${p.notas ? `<div style="color:var(--tm);font-size:12px;margin-top:2px">${escHtml(p.notas)}</div>` : ''}
           </div>
         </div>
-        <div style="display:flex;gap:6px;flex-shrink:0">
+        <div style="display:flex;gap:6px;flex-shrink:0;align-items:flex-start">
+          ${turnoHTML}
           <button onclick="abrirFormPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px">✏️ Editar</button>
           <button onclick="eliminarPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--rt)">🗑</button>
         </div>
@@ -3227,6 +3263,85 @@ function renderPacientes() {
   }).join('') + `<div style="text-align:right;margin-top:8px">
     <button onclick="sortPacientesAlfa()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">↕ Ordenar A→Z</button>
   </div>`
+}
+
+function buildTurnoHTML(idx, turno) {
+  if (!turno || !turno.fecha) {
+    // Sin turno: solo botón para agendar
+    return `<button onclick="abrirEditTurno(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px;white-space:nowrap" title="Agendar próximo turno">📅 Agendar turno</button>`;
+  }
+  // Calcular estado del turno
+  const hoy   = new Date(); hoy.setHours(0,0,0,0);
+  const [y,m,d] = turno.fecha.split('-').map(Number);
+  const fechaTurno = new Date(y, m-1, d);
+  const diffDias = Math.round((fechaTurno - hoy) / 86400000);
+
+  let badgeStyle, icono, label;
+  if (diffDias < 0) {
+    // Pasado
+    badgeStyle = 'background:#f0f0f0;color:#999;text-decoration:line-through;border:1px solid #ddd';
+    icono = '📅'; label = 'Turno vencido';
+  } else if (diffDias <= 3) {
+    // Próximo (≤3 días)
+    badgeStyle = 'background:var(--ab);color:var(--at);border:1px solid var(--at)';
+    icono = '⚠️'; label = diffDias === 0 ? 'Hoy' : diffDias === 1 ? 'Mañana' : `En ${diffDias} días`;
+  } else {
+    // Normal
+    badgeStyle = 'background:var(--acl);color:var(--ac);border:1px solid var(--ac)';
+    icono = '📅'; label = `En ${diffDias} días`;
+  }
+
+  const fechaLegible = fechaTurno.toLocaleDateString('es-AR', {weekday:'short',day:'numeric',month:'short'});
+  const horaStr = turno.hora ? ` · ${turno.hora}` : '';
+
+  return `<div style="display:flex;align-items:center;gap:4px">
+    <span style="${badgeStyle};border-radius:5px;padding:3px 8px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer" onclick="abrirEditTurno(${idx})" title="Editar turno">
+      ${icono} ${fechaLegible}${horaStr}<br><span style="font-size:10px;font-weight:400">${label}</span>
+    </span>
+  </div>`;
+}
+
+function abrirEditTurno(idx) {
+  const p = pacientes[idx];
+  if (!p) return;
+  const turno = p.proximo_turno || {};
+  _turnoEditIdx = idx;
+
+  document.getElementById('turno-modal-title').textContent = `Turno de ${p.nombre}`;
+  document.getElementById('turno-fecha-inp').value = turno.fecha || '';
+  document.getElementById('turno-hora-inp').value  = turno.hora  || '';
+  const borrarBtn = document.getElementById('turno-borrar-btn');
+  borrarBtn.style.display = turno.fecha ? 'inline-block' : 'none';
+  document.getElementById('turno-modal').style.display = 'block';
+  setTimeout(() => document.getElementById('turno-fecha-inp').focus(), 60);
+}
+
+function cerrarTurnoModal() {
+  document.getElementById('turno-modal').style.display = 'none';
+  _turnoEditIdx = null;
+}
+
+function guardarTurno() {
+  const idx   = _turnoEditIdx;
+  if (idx === null || !pacientes[idx]) return;
+  const fecha = document.getElementById('turno-fecha-inp').value;
+  const hora  = document.getElementById('turno-hora-inp').value;
+  if (!fecha) { showToast('⚠ Seleccioná una fecha para el turno.'); return; }
+  pacientes[idx].proximo_turno = { fecha, hora: hora || null };
+  saveState();
+  cerrarTurnoModal();
+  renderPacientes();
+  showToast('✓ Turno guardado.');
+}
+
+function borrarTurno() {
+  const idx = _turnoEditIdx;
+  if (idx === null || !pacientes[idx]) return;
+  delete pacientes[idx].proximo_turno;
+  saveState();
+  cerrarTurnoModal();
+  renderPacientes();
+  showToast('Turno eliminado.');
 }
 
 function escHtml(s) {
@@ -5243,7 +5358,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     const cm=document.getElementById('confirm-modal');
     if(cm&&cm.style.display==='block'){closeConfirm();return;}
-    const modals=['qd-modal','recepcion-modal','lot-modal','edit-modal','loose-modal','pac-modal'];
+    const modals=['qd-modal','recepcion-modal','lot-modal','edit-modal','loose-modal','pac-modal','turno-modal'];
     for(const id of modals){
       const el=document.getElementById(id);
       if(el&&el.style.display==='block'){
