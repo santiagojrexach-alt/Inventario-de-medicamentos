@@ -1456,9 +1456,14 @@ async function supaLoadState() {
     return;
   }
   // Renderizar app
-  applyDark(); applyTheme(themeIdx);
-  buildThemeSwatches(); renderAll(); updateHistFilter();
-  syncConfigUI(); updateTitleBar();
+  try {
+    applyDark(); applyTheme(themeIdx);
+    buildThemeSwatches(); renderAll(); updateHistFilter();
+    syncConfigUI(); updateTitleBar();
+  } catch(renderErr) {
+    console.error('[Tarmed] Error al renderizar:', renderErr);
+    // Seguimos igual — mejor mostrar la app aunque algo falle que quedarse en blanco
+  }
   // Mostrar el wrap y ocultar el loading
   document.getElementById('main-wrap').style.display = '';
   hideLoading();
@@ -2338,16 +2343,22 @@ function sTab(name) {
 
 }
 function renderAll() {
-  renderResumen();
-  renderInventory();
-  renderHistorial();
-  renderRetiros();
-  renderVencimientos();
-  renderReminder();
-  renderEditList();
-  renderVencidosBanner();
-  updateResidenteSelect();
-  updatePacienteDatalist();
+  const fns = [
+    ['renderResumen', renderResumen],
+    ['renderInventory', renderInventory],
+    ['renderHistorial', renderHistorial],
+    ['renderRetiros', renderRetiros],
+    ['renderVencimientos', renderVencimientos],
+    ['renderReminder', renderReminder],
+    ['renderEditList', renderEditList],
+    ['renderVencidosBanner', renderVencidosBanner],
+    ['updateResidenteSelect', updateResidenteSelect],
+    ['updatePacienteDatalist', updatePacienteDatalist],
+  ];
+  for (const [name, fn] of fns) {
+    try { fn(); }
+    catch(e) { console.error('[Tarmed] renderAll — error en ' + name + ':', e); }
+  }
   // Inyectar last-event-bar si no existe
   if (!document.getElementById('last-event-bar')) {
     const bar = document.createElement('div');
@@ -2443,7 +2454,7 @@ function showAc(inputId, listId){
   if(!matches.length){list.style.display='none';return;}
   list.innerHTML=matches.slice(0,7).map(n=>{
     const m=inventory.find(x=>x.name===n);
-    const badgeCls=m?GROUPS[m.group].badge:'b-gray';
+    const badgeCls=m?(GROUPS[m.group]?.badge||'b-gray'):'b-gray';
     return `<div class="ac-item" onclick="pickAc('${inputId}','${listId}','${n.replace(/'/g,"\\'")}')"><span style="flex:1">${n}</span><span class="badge ac-badge ${badgeCls}">${m?m.group:''}</span></div>`;
   }).join('');
   list.style.display='block';
@@ -2886,7 +2897,7 @@ function buildMedRowHTML(m, realIdx) {
       <div class="inv-med-info">
         <div class="inv-med-name">
           <span>${m.name}</span>
-          <span class="badge ${GROUPS[m.group].badge}" style="font-size:9px">${m.group}</span>
+          <span class="badge ${GROUPS[m.group]?.badge||'b-gray'}" style="font-size:9px">${m.group}</span>
           <button onclick="prefillarAgregar('${m.name}','${m.group}')" class="btn-inline-ghost" title="Agregar lote de otro laboratorio">+ Lote</button>
         </div>
         <div class="inv-lots">${chips}</div>
@@ -3056,7 +3067,8 @@ function guardarLooseSinCaja() {
   let m = inventory.find(x => x.name.toLowerCase() === name.toLowerCase() && !x.archived);
   if (!m) {
     // Create a new med entry with no lots, only looseComps
-    m = { name: name.trim(), group: 'Otros', lots: [], looseComps: {} };
+    const newGroup = getOrAddGroup('Compuestos Z / Otros');
+    m = { name: name.trim(), group: newGroup, lots: [], looseComps: {} };
     inventory.push(m);
   }
   if (!m.looseComps) m.looseComps = {};
