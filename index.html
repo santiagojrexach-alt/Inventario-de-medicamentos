@@ -3184,22 +3184,30 @@ function apellidoPac(nombre) {
   return partes[partes.length - 1].toLowerCase();
 }
 
-// Ordena pacientes alfabéticamente por apellido (in place), respetando orden manual si existe
+// Ordena pacientes alfabéticamente por apellido — alterna A→Z / Z→A con cada toque
+let _sortAlfaAsc = true;
 function sortPacientesAlfa() {
-  pacientes.sort((a, b) => apellidoPac(a.nombre).localeCompare(apellidoPac(b.nombre), 'es'));
+  _sortAlfaAsc = !_sortAlfaAsc;
+  const dir = _sortAlfaAsc ? 1 : -1;
+  pacientes.sort((a, b) => dir * apellidoPac(a.nombre).localeCompare(apellidoPac(b.nombre), 'es'));
   saveState();
   renderPacientes();
 }
 
 function sortPacientesTurno() {
   // Pacientes sin turno van al final; los con turno, del más próximo al más lejano
+  // Desempate por hora dentro del mismo día
   pacientes.sort((a, b) => {
     const fa = a.proximo_turno?.fecha || null;
     const fb = b.proximo_turno?.fecha || null;
     if (!fa && !fb) return 0;
     if (!fa) return 1;
     if (!fb) return -1;
-    return fa.localeCompare(fb);
+    if (fa !== fb) return fa.localeCompare(fb);
+    // Mismo día → desempatar por hora (null/vacío va al final del día)
+    const ha = a.proximo_turno?.hora || '99:99';
+    const hb = b.proximo_turno?.hora || '99:99';
+    return ha.localeCompare(hb);
   });
   saveState();
   renderPacientes();
@@ -3309,7 +3317,7 @@ function renderPacientes() {
       <div>${planHTML}</div>
     </div>`;
   }).join('') + `<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
-    <button onclick="sortPacientesAlfa()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">↕ A→Z</button>
+    <button onclick="sortPacientesAlfa()" id="btn-sort-alfa" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">${_sortAlfaAsc ? '↑ A→Z' : '↓ Z→A'}</button>
     <button onclick="sortPacientesTurno()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por próximo turno">📅 Por turno</button>
   </div>`
 }
