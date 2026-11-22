@@ -57,6 +57,10 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .ibtn{width:36px;height:36px;border:1.5px solid var(--bd);border-radius:var(--rsm);background:var(--pc);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:background .15s}
 .ibtn:hover{background:var(--ps);border-color:var(--ac)}
 .btn-primary{background:var(--ac);color:#fff;border:none;border-radius:var(--rsm);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.pac-fuente-opt{background:var(--ps);color:var(--t1);border:1.5px solid var(--bd);border-radius:var(--rsm);padding:5px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.pac-fuente-opt.selected{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pac-fuente-tarmed-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600;background:var(--acl);color:var(--ac);margin-left:4px}
+.pac-fuente-other-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600;background:var(--ps);color:var(--tm);margin-left:4px}
 .btn-primary:hover{background:var(--acd)}
 .btn-ghost{background:transparent;color:var(--t1);border:1.5px solid var(--bd);border-radius:var(--rsm);padding:7px 14px;font-size:13px;cursor:pointer;transition:background .15s}
 .btn-ghost:hover{background:var(--ps)}
@@ -444,6 +448,7 @@ button:hover{background:var(--ps)}
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Tarmed">
   <meta name="theme-color" content="#18302A">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2318302A'/%3E%3Ctext y='.85em' font-size='120' x='20'%3E%F0%9F%92%8A%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 <div id="app-loading" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#EEF5EE;z-index:700;gap:16px">
@@ -898,6 +903,14 @@ button:hover{background:var(--ps)}
       <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="pac-modal-title">Nuevo paciente</div>
       <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nombre / Identificación</label>
       <input id="pac-nombre" class="inp" placeholder="Ej: G. Di Giulio" style="width:100%;margin-bottom:10px;box-sizing:border-box">
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Fuente de medicación</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="pac-fuente-btns">
+        <button type="button" class="pac-fuente-opt" data-val="Tarmed" onclick="setPacFuente('Tarmed')">Tarmed</button>
+        <button type="button" class="pac-fuente-opt" data-val="Farmacia" onclick="setPacFuente('Farmacia')">Farmacia</button>
+        <button type="button" class="pac-fuente-opt" data-val="Purpsi" onclick="setPacFuente('Purpsi')">Purpsi</button>
+        <button type="button" class="pac-fuente-opt" data-val="PAMI" onclick="setPacFuente('PAMI')">PAMI</button>
+        <button type="button" class="pac-fuente-opt" data-val="Particular" onclick="setPacFuente('Particular')">Particular</button>
+      </div>
       <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Notas (diagnóstico, observaciones)</label>
       <input id="pac-notas" class="inp" placeholder="Opcional" style="width:100%;margin-bottom:14px;box-sizing:border-box">
       <div style="font-weight:600;font-size:13px;margin-bottom:8px">Plan farmacológico</div>
@@ -3149,8 +3162,9 @@ function compsTotalesMes(medName, dose) {
 
 // Devuelve un array de {medName, dose, disponibles, necesarios, ok}
 function calcCoberturas() {
+  // Solo los pacientes que retiran por Tarmed afectan al cálculo de stock
   const map = {};
-  pacientes.forEach(p => {
+  pacientes.filter(p => !p.fuente || p.fuente === 'Tarmed').forEach(p => {
     p.plan.forEach(item => {
       const key = item.name + '__' + item.dose;
       if (!map[key]) map[key] = { medName: item.name, dose: Number(item.dose), compsDia: 0 };
@@ -3174,6 +3188,21 @@ function apellidoPac(nombre) {
 function sortPacientesAlfa() {
   pacientes.sort((a, b) => apellidoPac(a.nombre).localeCompare(apellidoPac(b.nombre), 'es'));
   saveState();
+  renderPacientes();
+}
+
+function sortPacientesTurno() {
+  // Pacientes sin turno van al final; los con turno, del más próximo al más lejano
+  pacientes.sort((a, b) => {
+    const fa = a.proximo_turno?.fecha || null;
+    const fb = b.proximo_turno?.fecha || null;
+    if (!fa && !fb) return 0;
+    if (!fa) return 1;
+    if (!fb) return -1;
+    return fa.localeCompare(fb);
+  });
+  saveState();
+  renderPacientes();
 }
 
 function moverPaciente(idx, dir) {
@@ -3221,31 +3250,34 @@ function renderPacientes() {
   }
 
   // Para cada paciente calcular su cobertura individual descontando del pool compartido
+  // Solo los pacientes Tarmed consumen del pool; los otros se muestran sin indicador de cobertura
   const pacConCobertura = pacientes.map((p, idx) => {
+    const esTarmed = !p.fuente || p.fuente === 'Tarmed';
     const planRows = p.plan.map(item => {
       const key  = item.name + '__' + item.dose;
       const nec  = (item.compsDia || 0) * 30;
+      if (!esTarmed) return { item, nec, disp: null, ok: null };
       const disp = pool[key] ?? 0;
       const ok   = disp >= nec;
-      // Descontar del pool solo lo que puede cubrirse
       pool[key] = Math.max(0, (pool[key] ?? 0) - nec);
       return { item, nec, disp, ok };
     });
-    return { p, idx, planRows };
+    return { p, idx, planRows, esTarmed };
   });
 
-  lista.innerHTML = pacConCobertura.map(({ p, idx, planRows }) => {
+  lista.innerHTML = pacConCobertura.map(({ p, idx, planRows, esTarmed }) => {
     const planHTML = p.plan.length === 0
       ? `<span style="color:var(--tm);font-size:12px">Sin plan farmacológico</span>`
       : planRows.map(({ item, nec, disp, ok }) => {
-          const color = ok ? 'var(--gt)' : 'var(--rt)';
-          const icon  = ok ? '✅' : '⚠️';
+          const stockCell = disp === null
+            ? `<span style="color:var(--tm);font-size:11px">retira por ${escHtml(p.fuente)}</span>`
+            : `<span style="color:${ok ? 'var(--gt)' : 'var(--rt)'};font-size:12px;white-space:nowrap">
+                ${ok ? '✅' : '⚠️'} ${Math.min(disp,nec)}/${nec}
+               </span>`;
           return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:13px">
             <span style="flex:1;font-weight:500">${escHtml(item.name)} ${item.dose}mg</span>
             <span style="color:var(--tm)">${item.compsDia} comp/día → ${nec} comp/mes</span>
-            <span style="color:${color};font-size:12px;white-space:nowrap">
-              ${icon} ${Math.min(disp,nec)}/${nec}
-            </span>
+            ${stockCell}
           </div>`;
         }).join('');
 
@@ -3260,7 +3292,11 @@ function renderPacientes() {
             <button onclick="moverPaciente(${idx},1)" ${idx===pacientes.length-1?'disabled':''} class="btn-ghost" style="font-size:10px;padding:1px 5px;line-height:1;opacity:${idx===pacientes.length-1?0.3:1}" title="Mover abajo">▼</button>
           </div>
           <div>
-            <div style="font-weight:700;font-size:14px">👤 ${escHtml(p.nombre)}</div>
+            <div style="font-weight:700;font-size:14px">👤 ${escHtml(p.nombre)}
+              ${(p.fuente && p.fuente !== 'Tarmed')
+                ? `<span class="pac-fuente-other-badge">${escHtml(p.fuente)}</span>`
+                : `<span class="pac-fuente-tarmed-badge">Tarmed</span>`}
+            </div>
             ${p.notas ? `<div style="color:var(--tm);font-size:12px;margin-top:2px">${escHtml(p.notas)}</div>` : ''}
           </div>
         </div>
@@ -3272,8 +3308,9 @@ function renderPacientes() {
       </div>
       <div>${planHTML}</div>
     </div>`;
-  }).join('') + `<div style="text-align:right;margin-top:8px">
-    <button onclick="sortPacientesAlfa()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">↕ Ordenar A→Z</button>
+  }).join('') + `<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
+    <button onclick="sortPacientesAlfa()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">↕ A→Z</button>
+    <button onclick="sortPacientesTurno()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por próximo turno">📅 Por turno</button>
   </div>`
 }
 
@@ -3362,6 +3399,15 @@ function escHtml(s) {
 
 // ─── Modal agregar/editar paciente ────────────────────────────────────────────
 
+let _pacFuenteTemp = 'Tarmed';
+
+function setPacFuente(val) {
+  _pacFuenteTemp = val;
+  document.querySelectorAll('.pac-fuente-opt').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.val === val);
+  });
+}
+
 function abrirFormPaciente(idx) {
   _pacEditIdx = (idx !== undefined) ? idx : -1;
   const p = _pacEditIdx >= 0 ? pacientes[_pacEditIdx] : null;
@@ -3370,6 +3416,7 @@ function abrirFormPaciente(idx) {
   document.getElementById('pac-nombre').value = p ? p.nombre : '';
   document.getElementById('pac-notas').value  = p ? (p.notas || '') : '';
   _pacPlanTemp = p ? JSON.parse(JSON.stringify(p.plan)) : [];
+  setPacFuente(p?.fuente || 'Tarmed');
 
   renderPacPlanLista();
   document.getElementById('pac-modal').style.display = 'block';
@@ -3428,11 +3475,14 @@ function guardarPaciente() {
     if (item.compsDia <= 0) { showToast('⚠ La cantidad de comp/día debe ser mayor a 0.'); return; }
   }
 
+  const prevPac = _pacEditIdx >= 0 ? pacientes[_pacEditIdx] : null;
   const pac = {
-    id:     (_pacEditIdx >= 0 ? pacientes[_pacEditIdx].id : null) || pacNuevoId(),
+    id:     (prevPac?.id) || pacNuevoId(),
     nombre,
-    notas: document.getElementById('pac-notas').value.trim(),
-    plan:  _pacPlanTemp.map(item => ({ name: item.name.trim(), dose: Number(item.dose), compsDia: Number(item.compsDia) }))
+    fuente: _pacFuenteTemp || 'Tarmed',
+    notas:  document.getElementById('pac-notas').value.trim(),
+    plan:   _pacPlanTemp.map(item => ({ name: item.name.trim(), dose: Number(item.dose), compsDia: Number(item.compsDia) })),
+    proximo_turno: prevPac?.proximo_turno || null,
   };
 
   if (_pacEditIdx >= 0) {
