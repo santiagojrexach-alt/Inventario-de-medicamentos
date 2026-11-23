@@ -117,7 +117,7 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 /* BADGES */
 .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:var(--rsm);font-weight:600;white-space:nowrap}
 .b-blue{background:var(--bll);color:var(--bl)}.b-teal{background:var(--tb);color:var(--tt)}.b-amber{background:var(--ab);color:var(--at)}.b-purple{background:var(--pb);color:var(--pt)}.b-gray{background:var(--gy);color:var(--gyt)}.b-green{background:var(--gb);color:var(--gt)}.b-acc{background:var(--acl);color:var(--ac)}.b-red-s{background:var(--rb);color:var(--rt)}
-.sp{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.sp{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .sok{background:var(--gb);color:var(--gt)}.slow{background:var(--ab);color:var(--at)}.scrit{background:var(--rb);color:var(--rt)}
 .rsep{border-bottom:1px solid var(--bdl)}.rsep:last-child{border-bottom:none}
 .mrow{display:flex;align-items:flex-start;gap:8px;padding:8px 0}
@@ -134,7 +134,7 @@ body{background:var(--pg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 .inv-med-row:last-child{border-bottom:none}
 .inv-urg-bar{width:3px;min-height:44px;border-radius:2px;flex-shrink:0;align-self:stretch}
 .inv-med-info{flex:1;min-width:0}
-.inv-med-name{font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.inv-med-name{font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px;letter-spacing:.01em}
 .inv-lots{display:flex;gap:3px;flex-wrap:wrap}
 /* flash feedback +/- stock */
 @keyframes flash-add{0%{background:var(--gb);border-color:var(--gt)}100%{background:var(--ps);border-color:var(--bdl)}}
@@ -562,7 +562,7 @@ button:hover{background:var(--ps)}
     <button class="tab-sm" id="tab-btn-vencimientos" onclick="sTab('vencimientos')">📅 Vencimientos</button>
     <button class="tab-sm" id="tab-btn-analisis" onclick="sTab('analisis')">📊 Análisis</button>
     <button class="tab-sm" id="tab-btn-agregar" onclick="sTab('agregar')" title="Agregar medicamentos nuevos o recibir lotes de otro laboratorio">➕ Agregar / Recibir</button>
-    <button class="tab-sm" id="tab-btn-pacientes" onclick="sTab('pacientes')" title="Pacientes y planes farmacológicos">🧑‍⚕️ Pacientes</button>
+    <button class="tab-sm" id="tab-btn-pacientes" onclick="sTab('pacientes')" title="Pacientes y planes farmacológicos">🧑‍⚕️ Pacientes<span class="tab-badge" id="pac-turno-badge" style="display:none">0</span></button>
     <button class="cfg-btn" id="tab-btn-config" onclick="sTab('config')" title="Configuración" aria-label="Configuración">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -610,6 +610,7 @@ button:hover{background:var(--ps)}
   <div id="pedido-ciclo" style="display:none"></div>
   <div class="ped-sticky" id="ped-sticky">
     <span style="font-size:13px;font-weight:700;white-space:nowrap">🛒 <span id="ped-sticky-count">0</span>/10</span>
+    <span id="ped-sticky-days" style="font-size:11px;white-space:nowrap;display:none"></span>
     <div id="ped-sticky-labs" style="display:none"></div>
     <button class="tbtn" onclick="clearPedido()" style="font-size:11px;padding:3px 8px">✕ Limpiar</button>
     <button class="tbtn" onclick="autoSel()" style="font-size:11px;padding:3px 8px">✦ Auto</button>
@@ -664,8 +665,9 @@ button:hover{background:var(--ps)}
   <div class="card" id="hist-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;cursor:pointer;user-select:none" onclick="togHistPanel()">
       <div class="sec" style="margin:0">Historial de pedidos</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <select id="hist-filter" style="width:auto;font-size:12px"><option value="">Todos</option></select>
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--tm)" id="hist-total-label"></span>
+        <select id="hist-filter" style="width:auto;font-size:11px;padding:3px 7px" onclick="event.stopPropagation()"><option value="">Todos</option></select>
         <span id="hist-panel-arrow" style="font-size:20px;color:var(--tm);line-height:1;width:24px;text-align:center">▸</span>
       </div>
     </div>
@@ -716,7 +718,7 @@ button:hover{background:var(--ps)}
       <div><label class="fl">Cajas</label><input type="number" id="ret-qty" value="1" min="1" max="10" style="max-width:120px"></div>
     </div>
     <div id="disp-warn">⚠ Este lote está VENCIDO. Verificá antes de dispensar.</div>
-    <button class="btnred" onclick="registrarRetiro()">🖐 Registrar dispensación y descontar</button>
+    <button class="btn-primary" onclick="registrarRetiro()">💊 Registrar dispensación y descontar</button>
   </div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;cursor:pointer;user-select:none" onclick="togDispPanel()">
@@ -2294,6 +2296,18 @@ function renderCyclePedido() {
     : `📅 Próximo retiro Tarmed: <strong>${fmt}</strong> — faltan <strong>${daysLeft} días</strong>`;
   el.style.display = 'block';
   el.innerHTML = `<div style="font-size:12px;color:${color};background:var(--ps);border-radius:var(--rsm);padding:7px 12px;margin-bottom:8px;border-left:3px solid ${color}">${msg}</div>`;
+  // Mini badge en el sticky
+  const stickyDays = document.getElementById('ped-sticky-days');
+  if (stickyDays) {
+    const badge = daysLeft <= 0 ? '🔔 Hoy' : daysLeft === 1 ? '🔔 Mañana' : `📅 ${daysLeft}d`;
+    stickyDays.textContent = badge;
+    stickyDays.style.color = color;
+    stickyDays.style.display = 'inline';
+    stickyDays.style.background = 'var(--ps)';
+    stickyDays.style.borderRadius = '4px';
+    stickyDays.style.padding = '2px 6px';
+    stickyDays.style.fontWeight = daysLeft <= (cfg.ahead||7) ? '700' : '500';
+  }
 }
 function saveConfig(){cfg.themeIdx=themeIdx;saveState();renderConfigPreview();}
 
@@ -2392,6 +2406,7 @@ function renderAll() {
     ['renderVencidosBanner', renderVencidosBanner],
     ['updateResidenteSelect', updateResidenteSelect],
     ['updatePacienteDatalist', updatePacienteDatalist],
+    ['updatePacTurnoBadge', updatePacTurnoBadge],
   ];
   for (const [name, fn] of fns) {
     try { fn(); }
@@ -3299,7 +3314,13 @@ function renderPacientes() {
     return { p, idx, planRows, esTarmed };
   });
 
-  lista.innerHTML = pacConCobertura.map(({ p, idx, planRows, esTarmed }) => {
+  // Barra de orden — sticky arriba de la lista
+  const sortBar = `<div style="display:flex;gap:6px;justify-content:flex-end;margin-bottom:8px;position:sticky;top:0;z-index:10;background:var(--pbg);padding:4px 0">
+    <button onclick="sortPacientesAlfa()" id="btn-sort-alfa" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">${_sortAlfaAsc ? '↑ A→Z' : '↓ Z→A'}</button>
+    <button onclick="sortPacientesTurno()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por próximo turno">📅 Por turno</button>
+  </div>`;
+
+  lista.innerHTML = sortBar + pacConCobertura.map(({ p, idx, planRows, esTarmed }) => {
     const planHTML = p.plan.length === 0
       ? `<span style="color:var(--tm);font-size:12px">Sin plan farmacológico</span>`
       : planRows.map(({ item, nec, disp, ok }) => {
@@ -3336,16 +3357,15 @@ function renderPacientes() {
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;align-items:flex-start">
           ${turnoHTML}
+          <button onclick="irADispensar(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--ac)" title="Registrar dispensación para este paciente">💊 Dispensar</button>
           <button onclick="abrirFormPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px">✏️ Editar</button>
           <button onclick="eliminarPaciente(${idx})" class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--rt)">🗑</button>
         </div>
       </div>
       <div>${planHTML}</div>
     </div>`;
-  }).join('') + `<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap">
-    <button onclick="sortPacientesAlfa()" id="btn-sort-alfa" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por apellido">${_sortAlfaAsc ? '↑ A→Z' : '↓ Z→A'}</button>
-    <button onclick="sortPacientesTurno()" class="btn-ghost" style="font-size:11px;padding:4px 10px" title="Ordenar por próximo turno">📅 Por turno</button>
-  </div>`
+  }).join('');
+  updatePacTurnoBadge();
 }
 
 function buildTurnoHTML(idx, turno) {
@@ -3442,6 +3462,21 @@ function setPacFuente(val) {
   });
 }
 
+function irADispensar(idx) {
+  // Va a la tab Dispensación y pre-selecciona el paciente si tiene nombre
+  sTab('dispensacion');
+  const p = pacientes[idx];
+  if (!p) return;
+  setTimeout(() => {
+    const sel = document.getElementById('ret-pac-sel');
+    if (!sel) return;
+    // Buscar la opción cuyo texto coincide con el nombre del paciente
+    const opts = Array.from(sel.options);
+    const match = opts.find(o => o.text.includes(p.nombre) || o.value === p.nombre);
+    if (match) { sel.value = match.value; sel.dispatchEvent(new Event('change')); }
+  }, 100);
+}
+
 function abrirFormPaciente(idx) {
   _pacEditIdx = (idx !== undefined) ? idx : -1;
   const p = _pacEditIdx >= 0 ? pacientes[_pacEditIdx] : null;
@@ -3533,11 +3568,17 @@ function guardarPaciente() {
 
 function eliminarPaciente(idx) {
   const nombre = pacientes[idx]?.nombre || 'este paciente';
-  if (!confirm(`¿Eliminar a "${nombre}" del registro?`)) return;
+  const backup = JSON.parse(JSON.stringify(pacientes[idx]));
+  const backupIdx = idx;
   pacientes.splice(idx, 1);
   saveState();
   renderPacientes();
-  showToast(`Paciente eliminado.`);
+  showToast(`↩ "${nombre}" eliminado`, () => {
+    pacientes.splice(backupIdx, 0, backup);
+    saveState();
+    renderPacientes();
+    showToast(`✓ "${nombre}" restaurado.`);
+  }, 6000);
 }
 
 function getMedObs(name) {
@@ -3823,6 +3864,17 @@ function updateTbarSummary() {
   el.textContent = count > 0 ? `${pedidoLines.length} med. · ${count} cajas` : 'vacío';
 }
 function updatePedidoBadge(){const tot=getPedTotal();const b=document.getElementById('pedido-badge');if(b){b.textContent=tot;b.style.display=tot>0?'inline-block':'none';}}
+function updatePacTurnoBadge(){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const limite=new Date(hoy);limite.setDate(limite.getDate()+7);
+  const count=pacientes.filter(p=>{
+    const f=p.proximo_turno?.fecha;if(!f)return false;
+    const [y,m,d]=f.split('-').map(Number);const t=new Date(y,m-1,d);
+    return t>=hoy&&t<=limite;
+  }).length;
+  const b=document.getElementById('pac-turno-badge');
+  if(b){b.textContent=count;b.style.display=count>0?'inline-block':'none';}
+}
 
 function renderPedidoList(){updateTbarSummary();
   const q=(document.getElementById('ped-search')||{}).value||'';
@@ -4098,6 +4150,8 @@ function confirmarPedido() {
 function renderHistorial(){
   const filter=document.getElementById('hist-filter').value;
   const filtered=filter?historial.filter(h=>h.num===parseInt(filter)):historial;
+  const lbl=document.getElementById('hist-total-label');
+  if(lbl)lbl.textContent=historial.length?`${filtered.length} de ${historial.length} pedido${historial.length!==1?'s':''}` :'';
   if(!filtered.length){document.getElementById('historial-list').innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">Sin pedidos registrados</div><div class="empty-state-body">Los pedidos confirmados aparecerán acá.</div></div>';return;}
   document.getElementById('historial-list').innerHTML=[...filtered].reverse().map(h=>{
     const idx=historial.indexOf(h);
@@ -5811,7 +5865,7 @@ function loadMoreRetiros() {
     <div id="qd-content"></div>
     <div style="display:flex;gap:7px;margin-top:.85rem;justify-content:flex-end">
       <button onclick="closeQD()">Cancelar</button>
-      <button class="btnred" id="qd-confirm-btn">🖐 Dispensar</button>
+      <button class="btn-primary" id="qd-confirm-btn">💊 Dispensar</button>
     </div>
   </div>
 </div>
