@@ -253,6 +253,12 @@ button:hover{background:var(--ps)}
 .confirm-modal .confirm-btns button{padding:7px 16px;border-radius:var(--rsm);border:none;cursor:pointer;font-size:13px;font-weight:600}
 .confirm-modal .btn-cancel{background:var(--ps);color:var(--t2)}
 .confirm-modal .btn-danger{background:#C04040;color:#fff}
+@keyframes modal-in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.pac-notas-wrap{cursor:pointer;line-height:1.4}
+.pac-notas-wrap .pac-notas-more{position:absolute;bottom:0;right:0;background:linear-gradient(to right,transparent,var(--pc) 40%);padding-left:20px;font-size:11px;color:var(--ac);font-weight:600}
+.pac-notas-wrap.expanded{max-height:none!important}
+.pac-notas-wrap.expanded .pac-notas-more{display:none}
+.mbox,.confirm-modal,.mbd>div,.modal-anim{animation:modal-in .15s ease both}
 .mbox{background:var(--pc);border:1px solid var(--bd);border-radius:var(--rlg);padding:1.2rem;width:min(430px,95vw);margin:50px auto;box-shadow:0 8px 24px rgba(0,0,0,.12);box-sizing:border-box}
 /* THEME SWATCHES */
 .theme-swatch{width:36px;height:36px;border-radius:var(--rmd);cursor:pointer;border:2px solid transparent;position:relative;flex-shrink:0;overflow:hidden;transition:transform .1s}
@@ -451,6 +457,26 @@ button:hover{background:var(--ps)}
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2318302A'/%3E%3Ctext y='.85em' font-size='120' x='20'%3E%F0%9F%92%8A%3C/text%3E%3C/svg%3E">
 </head>
 <body>
+<script>
+/* Anti-flash: aplica bg correcto antes del primer render */
+(function(){
+  try{
+    var raw=localStorage.getItem('tarmed_v52');
+    var state=raw?JSON.parse(raw):null;
+    var theme=state&&state.theme?state.theme:'';
+    var THEMES={
+      '':     {bg:'#EEF5EE',fg:'#1A2E18'},
+      'lavanda':{bg:'#EEF0F8',fg:'#1E1A30'},
+      'celeste':{bg:'#E8F4F9',fg:'#0D2C3F'},
+      'durazno':{bg:'#FFF0E8',fg:'#3D1A0A'},
+      'neutro': {bg:'#F0F0F0',fg:'#1A1A1A'},
+      'dark':   {bg:'#121212',fg:'#E8E8E8'},
+    };
+    var t=THEMES[theme]||THEMES[''];
+    document.write('<style>#app-loading,#auth-screen{background:'+t.bg+'!important;color:'+t.fg+'!important}</style>');
+  }catch(e){}
+})();
+</script>
 <div id="app-loading" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#EEF5EE;z-index:700;gap:16px">
   <span style="font-size:48px">💊</span>
   <div style="font-size:14px;font-weight:600;color:#1a2e1a">Inventario Tarmed</div>
@@ -471,7 +497,7 @@ button:hover{background:var(--ps)}
   <div id="sync-indicator"></div>
   <div id="save-ind" style="display:none;align-items:center;gap:4px" title="Estado de guardado">
     <div id="save-dot" class="save-dot"></div>
-    <span id="save-label" style="font-size:10px;color:var(--tm)"></span>
+    <span id="save-label" style="font-size:11px;color:var(--tm)"></span>
   </div>
   <div class="unsaved-dot" id="unsaved-dot" title="Cambios sin guardar" style="display:none"></div>
   <span class="ver-badge" id="ver-badge" title="Versión de la app"></span>
@@ -598,11 +624,11 @@ button:hover{background:var(--ps)}
     </div>
     <div style="margin-bottom:.45rem">
     <div class="grp-collapse-hdr" onclick="toggleTbar()" id="tbar-hdr" style="margin-bottom:0">
-      <span class="grp-collapse-arrow" id="tbar-arrow">▸</span>
+      <span class="grp-collapse-arrow" id="tbar-arrow">▾</span>
       <span style="font-size:12px;font-weight:600;color:var(--t1)">Resumen del pedido</span>
       <span id="tbar-summary" style="font-size:11px;color:var(--tm)"></span>
     </div>
-    <div id="tbar-body" style="display:none">
+    <div id="tbar-body" style="">
   <div id="tbar-wrap" class="tbar ok">
       <div style="flex:1"><div style="font-size:13px;font-weight:700"><span id="used-boxes">0</span>/10 cajas</div><div id="lab-prog" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;font-size:10px;color:var(--tm);max-height:44px;overflow:hidden"></div></div>
     </div>
@@ -899,7 +925,7 @@ button:hover{background:var(--ps)}
   </div>
   <!-- Modal agregar/editar paciente -->
   <div id="pac-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
-    <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:480px;margin:40px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+    <div class="modal-anim" style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:480px;margin:40px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
       <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="pac-modal-title">Nuevo paciente</div>
       <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nombre / Identificación</label>
       <input id="pac-nombre" class="inp" placeholder="Ej: G. Di Giulio" style="width:100%;margin-bottom:10px;box-sizing:border-box">
@@ -926,7 +952,7 @@ button:hover{background:var(--ps)}
 
 <!-- Modal: editar turno de paciente -->
 <div id="turno-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
-  <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:360px;margin:80px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+  <div class="modal-anim" style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:360px;margin:80px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
     <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="turno-modal-title">Próximo turno</div>
     <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Fecha</label>
     <input id="turno-fecha-inp" class="inp" type="date" style="width:100%;margin-bottom:10px;box-sizing:border-box">
@@ -944,7 +970,7 @@ button:hover{background:var(--ps)}
 
 <!-- Modal: agregar comp. sueltos sin caja -->
 <div id="loose-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;overflow-y:auto">
-  <div style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:420px;margin:60px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+  <div class="modal-anim" style="background:var(--pc);border-radius:var(--rmd);padding:20px;max-width:420px;margin:60px auto;box-shadow:0 4px 24px rgba(0,0,0,.18)">
     <div style="font-weight:700;font-size:15px;margin-bottom:14px">Comprimidos sueltos sin caja</div>
     <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Medicamento</label>
     <input id="loose-med-input" class="inp" list="loose-med-list" placeholder="Escribí el nombre del medicamento…" style="width:100%;margin-bottom:10px;box-sizing:border-box" oninput="looseMedInputChanged()">
@@ -1925,13 +1951,13 @@ function saveState(){
       const saveInd=document.getElementById('save-ind');
       if(saveDot){saveDot.className='save-dot saved';}
       const savedTime = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-      if(saveLbl)saveLbl.textContent=`guardado ${savedTime}`;
+      if(saveLbl){saveLbl.textContent=`✓ guardado ${savedTime}`;saveLbl.style.fontWeight='600';saveLbl.style.color='var(--gt)';}
       if(saveInd){ saveInd.style.display='flex'; saveInd.title=`Último guardado: ${savedTime}`; }
       setTimeout(()=>{
         if(saveDot)saveDot.className='save-dot';
-        if(saveLbl)saveLbl.textContent='';
+        if(saveLbl){saveLbl.textContent='';saveLbl.style.fontWeight='';saveLbl.style.color='';}
         if(saveInd)saveInd.style.display='none';
-      },2500);
+      },3500);
     }catch(e){
       // Storage full or other error
       const errDot=document.getElementById('save-dot');if(errDot)errDot.className='save-dot error';
@@ -2124,9 +2150,8 @@ function copiarPedidoTexto(){
   items.forEach(i=>{txt+=`• ${i.name} ${i.dose}mg (${i.lab}) × ${i.cajas} caja${i.cajas!==1?'s':''}\n`;});
   txt+='─'.repeat(30)+'\n';
   txt+=`Total: ${items.reduce((s,i)=>s+i.cajas,0)}/10 cajas`;
-  navigator.clipboard.writeText(txt).then(()=>showToast('📋 Pedido copiado al portapapeles')).catch(()=>{
-    // fallback
-    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('📋 Pedido copiado al portapapeles');
+  navigator.clipboard.writeText(txt).then(()=>showToast(TOAST_CHECK_SVG+'Pedido copiado — listo para pegar')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast(TOAST_CHECK_SVG+'Pedido copiado — listo para pegar');
   });
 }
 function buildCSVRows() {
@@ -2534,9 +2559,9 @@ function buildMetricsMainHTML(total) {
 
 function buildMetricsGridHTML(crits, lows, venAlert, dispMes, dispHoy) {
   return `
-    <div class="mc"><div class="mcl">Sin stock</div><div class="mcv anim" style="color:${crits?'#C04040':'var(--t1)'}">${crits}</div></div>
-    <div class="mc"><div class="mcl">Stock bajo</div><div class="mcv anim" style="color:${lows?'#C07020':'var(--t1)'}">${lows}</div></div>
-    <div class="mc"><div class="mcl">Alertas venc.</div><div class="mcv anim" style="color:${venAlert?'#C07020':'var(--t1)'}">${venAlert}</div></div>
+    <div class="mc"><div class="mcl">Sin stock</div><div class="mcv anim" style="color:${crits?'var(--rt)':'var(--t1)'}">${crits}</div></div>
+    <div class="mc"><div class="mcl">Stock bajo</div><div class="mcv anim" style="color:${lows?'var(--at)':'var(--t1)'}">${lows}</div></div>
+    <div class="mc"><div class="mcl">Alertas venc.</div><div class="mcv anim" style="color:${venAlert?'var(--at)':'var(--t1)'}">${venAlert}</div></div>
     <div class="mc" style="cursor:pointer" onclick="sTab('dispensacion')" title="Ver dispensaciones de hoy">
       <div class="mcl">Disp. hoy</div>
       <div class="mcv anim" style="color:${dispHoy>0?'var(--ac)':'var(--t1)'}">${dispHoy}</div>
@@ -3250,9 +3275,10 @@ function renderPacientes() {
   }
 
   if (pacientes.length === 0) {
-    lista.innerHTML = `<div style="text-align:center;padding:32px;color:var(--tm);font-size:13px">
-      No hay pacientes registrados.<br>
-      <span style="font-size:12px;opacity:.7">Usá el botón "+ Agregar paciente" para comenzar.</span>
+    lista.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">👥</div>
+      <div class="empty-state-title">Sin pacientes registrados</div>
+      <div class="empty-state-body">Usá el botón "+ Agregar paciente" para comenzar a registrar.</div>
     </div>`;
     return;
   }
@@ -3300,12 +3326,12 @@ function renderPacientes() {
             <button onclick="moverPaciente(${idx},1)" ${idx===pacientes.length-1?'disabled':''} class="btn-ghost" style="font-size:10px;padding:1px 5px;line-height:1;opacity:${idx===pacientes.length-1?0.3:1}" title="Mover abajo">▼</button>
           </div>
           <div>
-            <div style="font-weight:700;font-size:14px">👤 ${escHtml(p.nombre)}
+            <div style="font-weight:700;font-size:14px">${escHtml(p.nombre)}
               ${(p.fuente && p.fuente !== 'Tarmed')
                 ? `<span class="pac-fuente-other-badge">${escHtml(p.fuente)}</span>`
                 : `<span class="pac-fuente-tarmed-badge">Tarmed</span>`}
             </div>
-            ${p.notas ? `<div style="color:var(--tm);font-size:12px;margin-top:2px">${escHtml(p.notas)}</div>` : ''}
+            ${p.notas ? `<div class="pac-notas-wrap" style="color:var(--tm);font-size:12px;margin-top:2px;max-height:3.6em;overflow:hidden;position:relative" onclick="this.classList.toggle('expanded')" title="Tocar para expandir">${escHtml(p.notas)}<span class="pac-notas-more">▾ más</span></div>` : ''}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;align-items:flex-start">
@@ -3336,7 +3362,7 @@ function buildTurnoHTML(idx, turno) {
   let badgeStyle, icono, label;
   if (diffDias < 0) {
     // Pasado
-    badgeStyle = 'background:#f0f0f0;color:#999;text-decoration:line-through;border:1px solid #ddd';
+    badgeStyle = 'background:var(--gy);color:var(--gyt);text-decoration:line-through;border:1px solid var(--bdl)';
     icono = '📅'; label = 'Turno vencido';
   } else if (diffDias <= 3) {
     // Próximo (≤3 días)
@@ -3545,6 +3571,8 @@ function buildInventoryEmptyState(filter, searchTerm) {
 // ══ RENDER: HISTORIAL PEDIDOS ════════════════════════════
 function togHist(idx){const el=document.getElementById('hentry-'+idx);if(!el)return;el.classList.toggle('collapsed');const tog=el.querySelector('.hist-toggle');if(tog)tog.textContent=tog.textContent.replace(el.classList.contains('collapsed')?'▾':'▸',el.classList.contains('collapsed')?'▸':'▾');}
 let histPanelOpen=false;
+let _tbarOpen=true;
+function toggleTbar(){_tbarOpen=!_tbarOpen;const body=document.getElementById('tbar-body');const arrow=document.getElementById('tbar-arrow');if(body)body.style.display=_tbarOpen?'':'none';if(arrow)arrow.textContent=_tbarOpen?'▾':'▸';}
 function togHistPanel(){histPanelOpen=!histPanelOpen;const body=document.getElementById('hist-panel-body');const arrow=document.getElementById('hist-panel-arrow');if(body)body.style.display=histPanelOpen?'block':'none';if(arrow)arrow.textContent=histPanelOpen?'▾':'▸';}
 let dispPanelOpen=false;
 function togDispPanel(){dispPanelOpen=!dispPanelOpen;const body=document.getElementById('disp-panel-body');const arrow=document.getElementById('disp-panel-arrow');if(body)body.style.display=dispPanelOpen?'block':'none';if(arrow)arrow.textContent=dispPanelOpen?'▾':'▸';}
@@ -4070,7 +4098,7 @@ function confirmarPedido() {
 function renderHistorial(){
   const filter=document.getElementById('hist-filter').value;
   const filtered=filter?historial.filter(h=>h.num===parseInt(filter)):historial;
-  if(!filtered.length){document.getElementById('historial-list').innerHTML='<p style="font-size:12px;color:var(--tm)">Sin pedidos registrados aún.</p>';return;}
+  if(!filtered.length){document.getElementById('historial-list').innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">Sin pedidos registrados</div><div class="empty-state-body">Los pedidos confirmados aparecerán acá.</div></div>';return;}
   document.getElementById('historial-list').innerHTML=[...filtered].reverse().map(h=>{
     const idx=historial.indexOf(h);
     // Compute lab totals for this order
@@ -5723,7 +5751,7 @@ function renderRetiros(resetPage=true) {
     `${filtered.length} de ${retiros.length} dispensación${retiros.length!==1?'es':''}`;
   if (!filtered.length) {
     document.getElementById('retiros-list').innerHTML =
-      '<p style="font-size:12px;color:var(--tm)">Sin dispensaciones para los filtros seleccionados.</p>';
+      '<div class="empty-state"><div class="empty-state-icon">💊</div><div class="empty-state-title">'+(retiros.length?'Sin resultados para los filtros':'Sin dispensaciones registradas')+'</div><div class="empty-state-body">'+(retiros.length?'Probá con otros filtros o fechas.':'Registrá la primera dispensación desde la pestaña Inventario.')+'</div></div>';
     return;
   }
   const visible  = filtered.slice(0, (dispPage + 1) * DISP_PAGE_SIZE);
