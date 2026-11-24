@@ -636,6 +636,25 @@ button:hover{background:var(--ps)}
     <button class="tbtn" onclick="autoSel()" style="font-size:11px;padding:3px 8px">✦ Auto</button>
     <button class="tbtn" onclick="openRecepcion()" style="font-size:11px;padding:3px 8px" title="Registrar medicamentos recibidos de Tarmed">📥 Recibido</button>
   </div>
+  <!-- PROYECCION DE DEMANDA -->
+  <div class="card" id="proy-card" style="margin-bottom:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:2px 0" onclick="toggleProy()">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="grp-collapse-arrow" id="proy-arrow">▸</span>
+        <span style="font-size:13px;font-weight:700;color:var(--t1)">📊 Proyección de demanda</span>
+      </div>
+      <span id="proy-summary" style="font-size:11px;color:var(--tm)"></span>
+    </div>
+    <div id="proy-body" style="display:none;margin-top:12px">
+      <p style="font-size:12px;color:var(--tm);margin:0 0 10px">Consumo mensual estimado (Tarmed) vs. stock actual. Las cajas sugeridas completan la cobertura de 30 días.</p>
+      <div id="proy-table"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="aplicarProyAlPedido()" style="font-size:12px;padding:6px 14px">✦ Aplicar sugerencia al pedido</button>
+        <button class="tbtn" onclick="renderProyeccion()" style="font-size:11px;padding:5px 10px">↺ Recalcular</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="sec">Datos del pedido</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:8px">
@@ -926,9 +945,13 @@ button:hover{background:var(--ps)}
 <!-- CONFIG -->
 <div class="panel" id="tab-pacientes">
   <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
       <div class="sec" style="margin:0">🧑‍⚕️ Mis pacientes</div>
       <button onclick="abrirFormPaciente()" class="btn-primary" style="font-size:12px;padding:6px 14px">+ Agregar paciente</button>
+    </div>
+    <div class="search-box" style="margin-bottom:10px">
+      <div class="si">🔍</div>
+      <input type="text" id="pac-search" placeholder="Buscar por nombre…" autocomplete="off" oninput="renderPacientes()">
     </div>
     <div id="pac-cobertura-banner"></div>
     <div id="pac-lista"></div>
@@ -2395,7 +2418,7 @@ function sTab(name) {
   if (activeBtn) activeBtn.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
   // Per-tab initialisation
   if (name === 'analisis')      setTimeout(renderAnalisis, 50);
-  if (name === 'pedido')        { renderPedido(); renderHistorial(); renderCyclePedido(); }
+  if (name === 'pedido')        { renderPedido(); renderHistorial(); renderCyclePedido(); renderProyeccion(); }
   if (name === 'dispensacion')  { initRetSelects(); renderRetiros(); }
 
   // vencimientos ya no es tab independiente — renderVencimientos() se llama desde toggleVenPanel()
@@ -2417,6 +2440,7 @@ function renderAll() {
     ['updateResidenteSelect', updateResidenteSelect],
     ['updatePacienteDatalist', updatePacienteDatalist],
     ['updatePacTurnoBadge', updatePacTurnoBadge],
+    ['renderProyeccion', renderProyeccion],
   ];
   for (const [name, fn] of fns) {
     try { fn(); }
@@ -3308,9 +3332,25 @@ function renderPacientes() {
     return;
   }
 
+  // Filtro por búsqueda
+  const pacSearch = (document.getElementById('pac-search')?.value || '').toLowerCase().trim();
+  const pacFiltrados = pacSearch
+    ? pacientes.filter(p => p.nombre.toLowerCase().includes(pacSearch))
+    : pacientes;
+
+  if (pacFiltrados.length === 0) {
+    lista.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <div class="empty-state-title">Sin resultados para "${escHtml(pacSearch)}"</div>
+      <div class="empty-state-body">Probá con otro nombre o revisá la ortografía.</div>
+    </div>`;
+    return;
+  }
+
   // Para cada paciente calcular su cobertura individual descontando del pool compartido
   // Solo los pacientes Tarmed consumen del pool; los otros se muestran sin indicador de cobertura
-  const pacConCobertura = pacientes.map((p, idx) => {
+  const pacConCobertura = pacFiltrados.map((p, _fi) => {
+    const idx = pacientes.indexOf(p); // índice real en el array global
     const esTarmed = !p.fuente || p.fuente === 'Tarmed';
     const planRows = p.plan.map(item => {
       const key  = item.name + '__' + item.dose;
@@ -4130,6 +4170,126 @@ function autoSel() {
   }
   saveState(); renderPedido(); updatePedidoBadge();
 }
+// ── PROYECCIÓN DE DEMANDA ──────────────────────────────────────────────
+let _proyOpen = false;
+function toggleProy() {
+  _proyOpen = !_proyOpen;
+  const body  = document.getElementById('proy-body');
+  const arrow = document.getElementById('proy-arrow');
+  if (body)  body.style.display  = _proyOpen ? '' : 'none';
+  if (arrow) arrow.textContent   = _proyOpen ? '▾' : '▸';
+  if (_proyOpen) renderProyeccion();
+}
+
+function buildProyeccionData() {
+  // 1. Sumar compsDia por med+dose de pacientes Tarmed únicamente
+  const map = {};
+  pacientes.filter(p => !p.fuente || p.fuente === 'Tarmed').forEach(p => {
+    p.plan.forEach(item => {
+      const key = item.name + '__' + item.dose;
+      if (!map[key]) map[key] = { medName: item.name, dose: Number(item.dose), compsDia: 0 };
+      map[key].compsDia += (item.compsDia || 0);
+    });
+  });
+
+  return Object.values(map).map(({ medName, dose, compsDia }) => {
+    const m = inventory.find(x => x.name === medName);
+    // Stock actual en comprimidos
+    const stockComps = m ? totalCompsStock(m, dose) : 0;
+    // Necesario en 30 días
+    const necesarioComps = compsDia * 30;
+    // Déficit en comprimidos
+    const deficitComps = Math.max(0, necesarioComps - stockComps);
+    // Buscar el lab y comps/caja del lote activo (el que tiene más stock)
+    let labSugerido = '';
+    let compsPorCaja = 30; // default
+    if (m) {
+      const lots = m.lots.filter(l => l.dose === dose && (l.qty || 0) > 0);
+      if (lots.length > 0) {
+        const bestLot = lots.reduce((a, b) => (b.qty > a.qty ? b : a));
+        labSugerido = bestLot.lab || '';
+        compsPorCaja = bestLot.comps || 30;
+      } else {
+        // Sin stock — tomar primer lote de esa dosis para saber el lab
+        const anyLot = m.lots.find(l => l.dose === dose);
+        if (anyLot) { labSugerido = anyLot.lab || ''; compsPorCaja = anyLot.comps || 30; }
+      }
+    }
+    const cajasSugeridas = deficitComps > 0 ? Math.ceil(deficitComps / compsPorCaja) : 0;
+    const group = m ? m.group : '';
+    return { medName, dose, compsDia, necesarioComps, stockComps, deficitComps, cajasSugeridas, labSugerido, compsPorCaja, group };
+  }).sort((a, b) => b.cajasSugeridas - a.cajasSugeridas || a.medName.localeCompare(b.medName));
+}
+
+function renderProyeccion() {
+  const data = buildProyeccionData();
+  // Actualizar summary (siempre, aunque el panel esté cerrado)
+  const sumEl = document.getElementById('proy-summary');
+  if (sumEl) {
+    const conDef = data.filter(d => d.cajasSugeridas > 0).length;
+    sumEl.textContent = conDef > 0
+      ? `${conDef} med${conDef !== 1 ? 's' : ''} con déficit`
+      : data.length > 0 ? '✓ Stock suficiente' : '';
+    sumEl.style.color = conDef > 0 ? 'var(--rt)' : 'var(--gt)';
+  }
+  if (!_proyOpen) return;
+  const tbl = document.getElementById('proy-table');
+  if (!tbl) return;
+  if (data.length === 0) {
+    tbl.innerHTML = '<p style="font-size:12px;color:var(--tm)">No hay pacientes Tarmed con plan cargado.</p>';
+    return;
+  }
+  const rows = data.map(d => {
+    const badge = GROUPS[d.group] ? `<span class="badge ${GROUPS[d.group].badge}" style="font-size:9px">${d.group}</span>` : '';
+    const stockCls = d.stockComps >= d.necesarioComps ? 'color:var(--gt);font-weight:600' : d.stockComps > 0 ? 'color:var(--at);font-weight:600' : 'color:var(--rt);font-weight:600';
+    const cajasCell = d.cajasSugeridas > 0
+      ? `<span style="font-weight:700;color:var(--rt)">${d.cajasSugeridas} caj</span>`
+      : `<span style="color:var(--gt)">—</span>`;
+    return `<div class="mrow rsep" style="align-items:flex-start;gap:6px;padding:7px 0">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:var(--t1)">${escHtml(d.medName)} ${d.dose}mg ${badge}</div>
+        <div style="font-size:11px;color:var(--tm);margin-top:2px">${d.compsDia} comp/día · necesita ${d.necesarioComps} comp/mes${d.labSugerido ? ' · ' + escHtml(d.labSugerido) : ''}</div>
+      </div>
+      <div style="text-align:right;white-space:nowrap;flex-shrink:0">
+        <div style="font-size:11px;${stockCls}">Stock: ${d.stockComps} comp</div>
+        <div style="font-size:12px;margin-top:2px">${cajasCell}</div>
+      </div>
+    </div>`;
+  }).join('');
+  tbl.innerHTML = rows;
+}
+
+function aplicarProyAlPedido() {
+  const data = buildProyeccionData().filter(d => d.cajasSugeridas > 0);
+  if (data.length === 0) {
+    showToast('✓ No hay déficit — el stock cubre la demanda mensual.');
+    return;
+  }
+  // Reemplazar pedidoLines con la sugerencia (respetando límites Tarmed)
+  pedidoLines = []; lineCounter = 0;
+  const lc = {};
+  let tot = 0;
+  for (const d of data) {
+    if (tot >= TARMED_MAX_TOTAL) break;
+    const lv = lc[d.labSugerido] || 0;
+    if (d.labSugerido && lv >= TARMED_MAX_PER_LAB) continue;
+    const add = Math.min(
+      d.cajasSugeridas,
+      d.labSugerido ? TARMED_MAX_PER_LAB - lv : TARMED_MAX_PER_LAB,
+      TARMED_MAX_TOTAL - tot
+    );
+    if (add > 0) {
+      pedidoLines.push({ lineId: newLineId(), name: d.medName, dose: d.dose, lab: d.labSugerido, qty: add });
+      if (d.labSugerido) lc[d.labSugerido] = (lc[d.labSugerido] || 0) + add;
+      tot += add;
+    }
+  }
+  saveState(); renderPedido(); updatePedidoBadge();
+  const aplicados = pedidoLines.length;
+  showToast(`✓ ${aplicados} línea${aplicados !== 1 ? 's' : ''} aplicada${aplicados !== 1 ? 's' : ''} al pedido`);
+}
+// ── FIN PROYECCIÓN ─────────────────────────────────────────────────────
+
 function buildPedidoItems(){return pedidoLines.filter(l=>l.qty>0).map(l=>{const m=inventory.find(x=>x.name===l.name);return{name:l.name,dose:l.dose,group:m?m.group:'',lab:l.lab||'Sin lab',cajas:l.qty};});}
 function buildPedConfRow(i) {
   const badge = GROUPS[i.group] ? GROUPS[i.group].badge : 'b-gray';
