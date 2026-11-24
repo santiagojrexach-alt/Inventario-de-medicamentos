@@ -559,7 +559,6 @@ button:hover{background:var(--ps)}
   </div>
   <div class="nav-secondary">
     
-    <button class="tab-sm" id="tab-btn-vencimientos" onclick="sTab('vencimientos')">📅 Vencimientos</button>
     <button class="tab-sm" id="tab-btn-analisis" onclick="sTab('analisis')">📊 Análisis</button>
     <button class="tab-sm" id="tab-btn-agregar" onclick="sTab('agregar')" title="Agregar medicamentos nuevos o recibir lotes de otro laboratorio">➕ Agregar / Recibir</button>
     <button class="tab-sm" id="tab-btn-pacientes" onclick="sTab('pacientes')" title="Pacientes y planes farmacológicos">🧑‍⚕️ Pacientes<span class="tab-badge" id="pac-turno-badge" style="display:none">0</span></button>
@@ -602,6 +601,27 @@ button:hover{background:var(--ps)}
   <div class="card" style="padding-top:.6rem;padding-bottom:.3rem"><div id="inventory-list"></div></div>
   <div style="margin-top:6px;text-align:right">
     <button onclick="agregarLooseSinCaja()" class="btn-ghost" style="font-size:11px;padding:4px 10px">＋ Comp. sueltos sin caja…</button>
+  </div>
+
+  <!-- PANEL VENCIMIENTOS fusionado -->
+  <div class="card" id="ven-panel-card" style="margin-top:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none" onclick="toggleVenPanel()">
+      <div class="sec" style="margin:0">📅 Vencimientos</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="ven-panel-summary" style="font-size:11px;color:var(--tm)"></span>
+        <span id="ven-panel-arrow" style="font-size:20px;color:var(--tm);line-height:1;width:24px;text-align:center">▸</span>
+      </div>
+    </div>
+    <div id="ven-panel-body" style="display:none;margin-top:10px">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;align-items:center" id="ven-filters"></div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <span style="font-size:10px;color:var(--tm);font-weight:600">Ordenar:</span>
+        <button class="sort-btn active" id="sort-days" onclick="setVenSort('days')">Por días</button>
+        <button class="sort-btn" id="sort-name" onclick="setVenSort('name')">Por nombre</button>
+        <button class="sort-btn" id="sort-group" onclick="setVenSort('group')">Por grupo</button>
+      </div>
+      <div id="ven-list"></div>
+    </div>
   </div>
 </div>
 
@@ -845,18 +865,6 @@ button:hover{background:var(--ps)}
     <div id="labgrp-wrap" style="position:relative;min-height:80px"></div>
     <div id="leg-labgrp" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;font-size:10px;color:var(--tm)"></div>
   </div>
-</div>
-
-<!-- VENCIMIENTOS -->
-<div class="panel" id="tab-vencimientos">
-  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;align-items:center" id="ven-filters"></div>
-  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-    <span style="font-size:10px;color:var(--tm);font-weight:600">Ordenar:</span>
-    <button class="sort-btn active" id="sort-days" onclick="setVenSort('days')">Por días</button>
-    <button class="sort-btn" id="sort-name" onclick="setVenSort('name')">Por nombre</button>
-    <button class="sort-btn" id="sort-group" onclick="setVenSort('group')">Por grupo</button>
-  </div>
-  <div class="card"><div id="ven-list"></div></div>
 </div>
 
 <!-- AGREGAR -->
@@ -2357,8 +2365,10 @@ function renderConfigPreview() {
 // NAV
 // ══ NAVEGACIÓN ═══════════════════════════════════════════
 const PRIMARY_TABS=['resumen','inventario','pedido','dispensacion'];
-const SECONDARY_TABS=['analisis','vencimientos','agregar','pacientes','config'];
+const SECONDARY_TABS=['analisis','agregar','pacientes','config'];
 function sTab(name) {
+  // Redirigir tab eliminada
+  if (name === 'vencimientos') { irAVencimientos(); return; }
   // Registrar historial de navegación (no duplicar si es el mismo tab)
   if (activeTab && activeTab !== name) {
     tabHistory.push(activeTab);
@@ -2388,7 +2398,7 @@ function sTab(name) {
   if (name === 'pedido')        { renderPedido(); renderHistorial(); renderCyclePedido(); }
   if (name === 'dispensacion')  { initRetSelects(); renderRetiros(); }
 
-  if (name === 'vencimientos')  renderVencimientos();
+  // vencimientos ya no es tab independiente — renderVencimientos() se llama desde toggleVenPanel()
   if (name === 'agregar')       renderEditList();
   if (name === 'pacientes')     renderPacientes();
   if (name === 'config')        { renderConfigPreview(); syncConfigUI(); buildThemeSwatches(); renderShortcutsTable(); }
@@ -2440,7 +2450,7 @@ function buildSearchResults(q) {
     if (v.name.toLowerCase().includes(q) || (v.lab||'').toLowerCase().includes(q))
       results.push({ type:'Vencimiento', icon:'📅',
         label:`${v.name} ${v.dose}mg ${v.lab} · ${normDate(v.ven)}`,
-        action:()=>sTab('vencimientos')
+        action:()=>irAVencimientos()
       });
   });
 
@@ -2628,7 +2638,7 @@ function buildNextVenHTML(nextVen) {
         <div style="font-weight:600">${nextVen.days < 0 ? 'Lote VENCIDO' : 'Próximo vencimiento'}: ${nextVen.name} ${nextVen.dose}mg${nextVen.lab ? ' (' + nextVen.lab + ')' : ''}</div>
         <div style="font-size:11px;opacity:.85">${normDate(nextVen.ven)} · ${timeLabel} · Stock: ${nextVen.qty} caja${nextVen.qty !== 1 ? 's' : ''}</div>
       </div>
-      <button onclick="sTab('vencimientos')" style="font-size:10px;padding:3px 8px;flex-shrink:0">Ver todos →</button>
+      <button onclick="irAVencimientos()" style="font-size:10px;padding:3px 8px;flex-shrink:0">Ver todos →</button>
     </div>`;
 }
 
@@ -3797,6 +3807,23 @@ function buildVenRow(v) {
     </div>`;
 }
 function renderVencimientos() {
+  // Actualizar summary en el encabezado del panel (siempre, aunque esté cerrado)
+  const allVenAll = getAllLotVen();
+  const alertCount = allVenAll.filter(v => v.days !== null && v.days <= VEN_ALERT_DAYS).length;
+  const venSummEl = document.getElementById('ven-panel-summary');
+  if (venSummEl) {
+    if (alertCount > 0) {
+      venSummEl.textContent = `⚠ ${alertCount} con alerta`;
+      venSummEl.style.color = 'var(--at)';
+      venSummEl.style.fontWeight = '600';
+    } else {
+      venSummEl.textContent = allVenAll.length ? `${allVenAll.length} lotes` : '';
+      venSummEl.style.color = '';
+      venSummEl.style.fontWeight = '';
+    }
+  }
+  // Si el panel está cerrado, no renderizar la lista
+  if (!_venPanelOpen) return;
   const groups = ['Todos', ...Object.keys(GROUPS)];
   document.getElementById('ven-filters').innerHTML = groups.map(g =>
     `<button class="fp ${venFilter===g?'active':''}" onclick="setVenFilter('${g}')">${g}</button>`
@@ -3839,6 +3866,23 @@ function renderVencimientos() {
   }
 }
 // sort
+let _venPanelOpen = false;
+function toggleVenPanel() {
+  _venPanelOpen = !_venPanelOpen;
+  const body  = document.getElementById('ven-panel-body');
+  const arrow = document.getElementById('ven-panel-arrow');
+  if (body)  body.style.display  = _venPanelOpen ? '' : 'none';
+  if (arrow) arrow.textContent   = _venPanelOpen ? '▾' : '▸';
+  if (_venPanelOpen) renderVencimientos();
+}
+function irAVencimientos() {
+  sTab('inventario');
+  setTimeout(() => {
+    if (!_venPanelOpen) toggleVenPanel();
+    const card = document.getElementById('ven-panel-card');
+    if (card) card.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 80);
+}
 function toggleVenGroup(groupName) {
   const key   = groupName.replace(/[^a-zA-Z0-9]/g,'_');
   const body  = document.getElementById('vgb-' + key);
@@ -4282,7 +4326,7 @@ function renderVencidosBanner(){
   if(!b)return;
   if(!vencidos.length){b.style.display='none';return;}
   b.style.display='flex';b.className='banner b-venc-global';
-  b.innerHTML=`⚠️ <span style="font-weight:600">${vencidos.length} lote${vencidos.length!==1?'s':''} VENCIDO${vencidos.length!==1?'S':''}: ${vencidos.map(v=>v.name+' '+v.dose+'mg').join(', ')}</span> <button onclick="sTab('vencimientos')" style="margin-left:auto;font-size:10px;padding:2px 8px;flex-shrink:0">Ver →</button>`;
+  b.innerHTML=`⚠️ <span style="font-weight:600">${vencidos.length} lote${vencidos.length!==1?'s':''} VENCIDO${vencidos.length!==1?'S':''}: ${vencidos.map(v=>v.name+' '+v.dose+'mg').join(', ')}</span> <button onclick="irAVencimientos()" style="margin-left:auto;font-size:10px;padding:2px 8px;flex-shrink:0">Ver →</button>`;
 }
 // DISPENSACIÓN AUTOCOMPLETE
 let dispAcFocused=-1;
@@ -5180,7 +5224,7 @@ function addMed() {
 function sanityCheck(){
   const required=['main-wrap','metrics-grid','inventory-list','historial-list','retiros-list',
     'tab-resumen','tab-inventario','tab-pedido','tab-dispensacion','tab-analisis',
-    'tab-vencimientos','tab-agregar','tab-config',
+    'tab-agregar','tab-config',
     'save-ind','unsaved-dot','toast-wrap','reminder-banner','vencidos-banner',
     'ret-fecha','ret-med-txt','ret-dose','ret-qty','ret-paciente',
     'ped-mes','ped-anio','ped-num','new-name','new-group','new-dose',
@@ -5414,7 +5458,7 @@ const TUT_STEPS=[
   {tab:'inventario', title:'Inventario',            arrow:'arrow-top',  anchorId:'tab-btn-inventario', body:'Todos tus lotes ordenados por urgencia. Usá los botones − y + en cada chip para ajustar el stock rápido, o el botón <strong>Disp.</strong> para registrar una dispensación al instante.'},
   {tab:'dispensacion',title:'Dispensación',         arrow:'arrow-top',  anchorId:'tab-btn-dispensacion',body:'Registrá cada medicamento que sale al paciente. Escribí el nombre (autocompleta), elegí el lote, anotá la cama o paciente y confirmá. El stock se descuenta automáticamente con opción de deshacer.'},
   {tab:'pedido',     title:'Pedido a Tarmed',       arrow:'arrow-top',  anchorId:'tab-btn-pedido',     body:'Armá el pedido mensual: máx. 10 cajas totales, máx. 3 por laboratorio. Los medicamentos con déficit aparecen primero en naranja. Usá <strong>✦ Auto</strong> para que la app complete el pedido automáticamente.'},
-  {tab:'vencimientos',title:'Vencimientos',         arrow:'arrow-top',  anchorId:'tab-btn-vencimientos',body:'Todos los lotes con fecha de vencimiento, ordenables por días, nombre o grupo. Un banner rojo en la topbar te avisa si hay lotes ya vencidos.'},
+  {tab:'inventario',  title:'Vencimientos',         arrow:'arrow-top',  anchorId:'tab-btn-inventario',  body:'Los vencimientos están integrados al final del Inventario. Un banner rojo en la topbar te avisa si hay lotes vencidos.'},
   {tab:'agregar',    title:'Agregar medicamento',   arrow:'arrow-top',  anchorId:'tab-btn-agregar',    body:'Sumá lotes nuevos al inventario. Si el medicamento ya existe, el lote nuevo se agrega sin duplicar. Podés duplicar un lote existente con el botón 📋 para cambiar solo el vencimiento.'},
   {tab:'config',     title:'Configuración',         arrow:'arrow-top',  anchorId:'tab-btn-config',     body:'Configurá tu ID: Institución, Servicio y Profesional. También ajustá el día de retiro en Tarmed, los días de alerta de vencimiento, el tamaño de texto y exportá un backup JSON.'},
 ];
